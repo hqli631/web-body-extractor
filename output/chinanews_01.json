@@ -1,0 +1,62 @@
+{
+  "title": "公安部就修订《公安机关办理行政案件程序规定》公开征求意见",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "中新网10月30日电 公安部30日在官网发布公告称，为贯彻落实修订后的治安管理处罚法、行政处罚法等法律法规，进一步规范公安行政执法，提高公安机关行政案件办理质量和执法水平，经充分调研论证，公安部起草了《公安机关办理行政案件程序规定(修订征求意见稿)》，向社会公开征求意见。",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[1]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "这次修订的主要内容包括如下4个方面：贯彻落实上位法规定要求，进一步保障当事人合法权益，进一步规范公安机关执法行为，进一步健全衔接机制、严密执法程序。",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[3]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "公众可以通过以下途径和方式提出意见建议：",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[4]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "1、通过公安部网站(www.mps.gov.cn)查阅公开征求意见稿。",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[5]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "2、通过邮件将意见发送至：fazhijumps@163.com.",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[6]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "3、通过信函方式将意见寄至：北京市东城区东长安街14号公安部法制局，邮编100741，并在信封上注明“对《公安机关办理行政案件程序规定(修订征求意见稿)》的意见建议”。",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[7]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "意见反馈截止时间为2026年11月28日。",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[8]"
+    }
+  ],
+  "metadata": [
+    {
+      "kind": "editor",
+      "text": "【编辑:付子豪】",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/div[1]"
+    }
+  ],
+  "excluded": [
+    {
+      "kind": "advertisement_or_page_widget",
+      "text": "",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/table"
+    },
+    {
+      "kind": "advertisement_or_page_widget",
+      "text": "",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/div[2]"
+    }
+  ],
+  "warnings": [
+    "static_dom_only_no_css_visibility_javascript_or_ocr"
+  ]
+}

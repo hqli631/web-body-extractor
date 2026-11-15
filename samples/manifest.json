@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "scope": "9 historical exposed natural pages, 3 adapted layouts; functional regression, not unseen semantic accuracy",
+  "pages": [
+    {
+      "id": "chinanews_01",
+      "path": "samples/chinanews_01.html",
+      "template": "chinanews",
+      "url": "https://www.chinanews.com.cn/gn/2026/10-30/10723267.shtml",
+      "sha256": "ce107f27354964c4f31b06b5a7731963e8b7edab9c228e07f23fbfd2c9a82c5d",
+      "original_path": "samples/xpath_practice.html",
+      "role": "historical_exposed_demo"
+    },
+    {
+      "id": "chinanews_02",
+      "path": "samples/chinanews_02.html",
+      "template": "chinanews",
+      "url": "https://www.chinanews.com.cn/sh/2026/11-02/10724893.shtml",
+      "sha256": "601ced823ca9912cacac2d0ddc3ae0e94f43f4b8b63a541f917d3e32a122aae5",
+      "original_path": "samples/xpath_practice_02.html",
+      "role": "historical_exposed_demo"
+    },
+    {
+      "id": "chinanews_03",
+      "path": "samples/chinanews_03.html",
+      "template": "chinanews",
+      "url": "https://www.chinanews.com.cn/dxw/2026/11-03/10725312.shtml",
+      "sha256": "1c9dea419228915c7358d39dbbdadb9771cf26d93e65887e4949ad21d4b09bb6",
+      "original_path": "samples/xpath_practice_03.html",
+      "role": "historical_exposed_demo"
+    },
+    {
+      "id": "sina_01",
+      "path": "samples/sina_01.html",
+      "template": "sina",
+      "url": "https://finance.sina.com.cn/stock/bxjj/2026-10-27/doc-iniwrkkw2082967.shtml",
+      "sha256": "d2c40b3ca659fd59f83f427079f4ea6264b559f2b938d94014bd154cade22f84",
+      "original_path": "samples/blog_01.html",
+      "role": "historical_exposed_demo"
+    },
+    {
+      "id": "sina_02",
+      "path": "samples/sina_02.html",
+      "template": "sina",
+      "url": "https://finance.sina.com.cn/roll/2026-10-30/doc-iniwxzqf8395260.shtml",
+      "sha256": "c655ca0fa14a9f65c87531dc4d1ede032149a796f4631b87cb0885c748e8e327",
+      "original_path": "samples/collected_14a028de299edfab.html",
+      "role": "historical_exposed_demo"
+    },
+    {
+      "id": "sina_03",
+      "path": "samples/sina_03.html",
+      "template": "sina",
+      "url": "https://finance.sina.com.cn/wm/2026-10-30/doc-iniwxksk5906408.shtml",
+      "sha256": "c6348f97447c665018d507e3ed78a99a2d0989b13bc60087bb075bc8680ce4c4",
+      "original_path": "samples/collected_af5904c15d1deebc.html",
+      "role": "historical_exposed_demo"
+    },
+    {
+      "id": "pg_essay_01",
+      "path": "samples/pg_essay_01.html",
+      "template": "pg_essay",
+      "url": "https://www.paulgraham.com/avg.html",
+      "sha256": "beb172c328102098dfd5fda91dc86e8899e563f34cccb4bce285f6b0ff0d809b",
+      "original_path": "data/natural_v1/pg_essay_v1/train_1.html",
+      "role": "historical_exposed_demo"
+    },
+    {
+      "id": "pg_essay_02",
+      "path": "samples/pg_essay_02.html",
+      "template": "pg_essay",
+      "url": "https://www.paulgraham.com/wealth.html",
+      "sha256": "a5f0d6cd7f29d2724af1bfbe1efc66f1de79d16d7bd6ada9c2cb79f16cef51f3",
+      "original_path": "data/natural_v1/pg_essay_v1/train_2.html",
+      "role": "historical_exposed_demo"
+    },
+    {
+      "id": "pg_essay_03",
+      "path": "samples/pg_essay_03.html",
+      "template": "pg_essay",
+      "url": "https://www.paulgraham.com/essay.html",
+      "sha256": "db1035122e22995ec251242bed7f89696f162ac8b6863cee0f220f367b2cd7b3",
+      "original_path": "data/natural_v1/pg_essay_v1/dev_3.html",
+      "role": "historical_exposed_demo"
+    }
+  ]
+}

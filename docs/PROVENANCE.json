@@ -1,0 +1,22 @@
+{
+  "source_repository": "https://github.com/hqli631/web_extract_demo",
+  "source_commit": "3cfa8a3",
+  "copied_rule_sources": [
+    {
+      "source_path": "learning/generated/sina_v2.py",
+      "destination": "rules/sina.py",
+      "sha256": "ea331e94719c99e2bd46653f0292adc9bea1386624d96b8d340bf529d2139003"
+    },
+    {
+      "source_path": "learning/generated/chinanews_v2.py",
+      "destination": "rules/chinanews.py",
+      "sha256": "9b2f47fd572bbb103b910a01292a43ccabebdc30a7e62bdbc42fa3177aa43ff2"
+    },
+    {
+      "source_path": "learning/generated/pg_essay_v1.py",
+      "destination": "rules/pg_essay.py",
+      "sha256": "def383a785ea755a8fb3ef97f7ce68a6f0c6b4bef4ef336db6a648285e9bcc6c"
+    }
+  ],
+  "notes": "Copied reviewed reference rules, not LoRA candidates; original HTML bytes, resources not bundled."
+}
