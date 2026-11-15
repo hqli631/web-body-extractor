@@ -9,7 +9,7 @@
 需要 Python 3.10 或更高版本，并能用 pip 安装依赖。打开 VS Code 的终端，执行：
 
 ~~~powershell
-cd "D:\codex project\项目一"
+cd "D:\codex project\web-body-extractor"
 .\run.bat
 ~~~
 
@@ -18,7 +18,7 @@ cd "D:\codex project\项目一"
 如果希望亲手完成安装过程：
 
 ~~~powershell
-cd "D:\codex project\项目一"
+cd "D:\codex project\web-body-extractor"
 py -3 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -X utf8 .\app.py batch
