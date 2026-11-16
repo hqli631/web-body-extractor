@@ -8,6 +8,7 @@ import time
 from html import escape
 from datetime import datetime, timezone
 from extractor import extract_bytes, detect_template
+from trafilatura_baseline import compare_manifest_pages
 from lxml import html
 
 ROOT = Path(__file__).resolve().parent
@@ -74,7 +75,18 @@ def build_report(report, destination):
     import os
     destination.mkdir(parents=True, exist_ok=True)
     rows, sections = [], []
-    labels = {'paragraph':'段落','subheading':'小标题','caption':'图说','table':'表格'}
+    labels = {
+        'paragraph': '段落',
+        'subheading': '小标题',
+        'heading': '标题',
+        'caption': '图说',
+        'table': '表格',
+        'code_block': '代码块',
+        'list_item': '列表项',
+        'definition_term': '定义项',
+        'definition_description': '定义说明',
+        'footnote': '脚注',
+    }
     for item in report['pages']:
         ident = escape(item['id'], quote=True)
         result = item.get('result', {})
@@ -97,7 +109,11 @@ def build_report(report, destination):
             section += '</ol>'
         sections.append(section+'<p><a href="#top">返回汇总</a></p></section>')
     page = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>项目一 · XPath规则抽取报告</title><style>body{font:16px/1.7 system-ui,sans-serif;max-width:1120px;margin:28px auto;padding:0 20px;color:#18314a}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccd6e0;padding:8px;text-align:left}section{margin-top:32px;border-top:2px solid #ccd6e0;padding-top:16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f4f8;padding:16px}code{overflow-wrap:anywhere}.kind{background:#eaf1fa;padding:3px 8px}li{margin-bottom:16px}.note{background:#fff4d8;padding:16px}a{color:#185ca2}</style>'
-    page += '<h1 id="top">项目一：基于XPath的规则化网页正文提取</h1><p>样本 '+str(report['samples'])+'；提取及证据检查通过 '+str(report['extraction_passed'])+'；与固定历史回归基准一致 '+str(report['baseline_matches'])+'。</p><p class="note">这是已适配布局、已有开发网页的功能回归。不是未见网页语义准确率；原文证据通过不能证明没有漏提。没有调用AI、训练模型或解析图片像素。原HTML资源可能缺失，视觉不保证与原站一致。</p><table><tr><th>样本</th><th>模板</th><th>状态</th><th>正文块</th><th>元数据</th><th>排除项</th><th>历史基准</th></tr>'+''.join(rows)+'</table>'+''.join(sections)+'</html>'
+    baseline_report = destination / 'trafilatura_comparison.html'
+    baseline_link = ('<p><a href="'+baseline_report.name+'">查看 Trafilatura 外部基线对照</a>。该报告是独立参照，不是人工金标。</p>'
+                     if baseline_report.exists() else
+                     '<p class="note">Trafilatura 外部基线对照尚未生成；运行 baseline 命令后会在此处提供入口。</p>')
+    page += '<h1 id="top">项目一：基于XPath的规则化网页正文提取</h1><p>样本 '+str(report['samples'])+'；提取及证据检查通过 '+str(report['extraction_passed'])+'；与固定历史回归基准一致 '+str(report['baseline_matches'])+'。</p>'+baseline_link+'<p class="note">这是已适配布局、已有开发网页的功能回归。不是未见网页语义准确率；原文证据通过不能证明没有漏提。没有调用AI、训练模型或解析图片像素。原HTML资源可能缺失，视觉不保证与原站一致。</p><table><tr><th>样本</th><th>模板</th><th>状态</th><th>正文块</th><th>元数据</th><th>排除项</th><th>历史基准</th></tr>'+''.join(rows)+'</table>'+''.join(sections)+'</html>'
     (destination/'index.html').write_text(page,encoding='utf8')
 
 def main():
@@ -107,12 +123,32 @@ def main():
     b.add_argument('--manifest');b.add_argument('--output-dir');b.add_argument('--report-dir')
     e=sub.add_parser('extract',help='extract one saved HTML page')
     e.add_argument('--input',required=True);e.add_argument('--output',required=True)
-    e.add_argument('--template',choices=['auto','sina','chinanews','pg_essay'],default='auto')
+    e.add_argument('--template',choices=['auto','sina','chinanews','pg_essay','pydoc'],default='auto')
+    t=sub.add_parser('baseline',help='compare rule extraction with the local Trafilatura baseline')
+    t.add_argument('--manifest',action='append',help='manifest to compare; repeat for multiple manifests')
+    t.add_argument('--output',default=str(ROOT / 'output/trafilatura_comparison.json'))
+    t.add_argument('--report',default=str(ROOT / 'reports/trafilatura_comparison.html'))
+    t.add_argument('--reference-dir',default=str(ROOT / 'output/trafilatura_reference'))
     args=p.parse_args()
     try:
         if args.command=='batch':
             report=batch(local_path(args.manifest) if args.manifest else None,local_path(args.output_dir) if args.output_dir else None,local_path(args.report_dir) if args.report_dir else None)
             return 0 if report['extraction_passed']==report['samples'] and all(p.get('baseline_match') is not False for p in report['pages']) else 1
+        if args.command=='baseline':
+            manifests=args.manifest or [str(ROOT / 'samples/manifest.json')]
+            pydoc_manifest=ROOT / 'samples/pydoc_manifest.json'
+            if args.manifest is None and pydoc_manifest.exists():
+                manifests.append(str(pydoc_manifest))
+            report=compare_manifest_pages(
+                manifests,
+                local_path(args.output),
+                local_path(args.report),
+                local_path(args.reference_dir),
+            )
+            print(f"BASELINE: compared={report['summary']['compared']}, errors={report['summary']['errors']}, "
+                  f"average_f1={report['summary']['average_char_ngram_f1']}")
+            print(f"REPORT: {local_path(args.report)}")
+            return 0 if report['summary']['errors']==0 else 1
         source=local_path(args.input);target=local_path(args.output)
         if source.resolve()==target.resolve():raise ValueError('Output must not overwrite source HTML')
         result=extract_bytes(source.read_bytes(),args.template)

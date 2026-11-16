@@ -11,7 +11,7 @@ goto install
 python -m venv .venv
 if errorlevel 1 goto failed
 :install
-".venv\Scripts\python.exe" -c "import importlib.metadata; assert importlib.metadata.version('lxml') == '5.3.0'" >nul 2>nul
+".venv\Scripts\python.exe" -c "import importlib.metadata; assert importlib.metadata.version('lxml') == '6.1.3'; assert importlib.metadata.version('trafilatura') == '2.3.1'" >nul 2>nul
 if not errorlevel 1 goto extract
 ".venv\Scripts\python.exe" -m pip install -r requirements.txt
 if errorlevel 1 goto failed

@@ -1,0 +1,527 @@
+{
+  "version": 1,
+  "generated_at_utc": "2026-11-16T15:22:00.886810+00:00",
+  "trafilatura_repository": "https://github.com/adbar/trafilatura",
+  "trafilatura_version": "2.3.1",
+  "settings": {
+    "fast": false,
+    "no_fallback": false,
+    "favor_precision": false,
+    "favor_recall": false,
+    "include_comments": false,
+    "include_tables": true,
+    "include_images": false,
+    "include_links": false,
+    "include_formatting": false
+  },
+  "comparison_method": "normalized body segments; 5-character n-gram precision, recall and F1; no manual adjudication",
+  "caveat": "Trafilatura is an external baseline, not absolute ground truth. It can include page furniture or omit content.",
+  "manifests": [
+    {
+      "path": "samples/manifest.json",
+      "scope": "9 historical exposed natural pages, 3 adapted layouts; functional regression, not unseen semantic accuracy"
+    },
+    {
+      "path": "samples/pydoc_manifest.json",
+      "scope": "6 Python official Sphinx documentation pages: three adaptation pages plus three frozen holdout pages (library index, interpreter, appetite). Not part of the original regression baseline."
+    }
+  ],
+  "summary": {
+    "pages": 15,
+    "compared": 15,
+    "errors": 0,
+    "title_matches": 15,
+    "review_count": 3,
+    "average_char_ngram_f1": 0.9169,
+    "average_sequence_ratio": 0.545
+  },
+  "pages": [
+    {
+      "id": "chinanews_01",
+      "group": "manifest",
+      "path": "samples/chinanews_01.html",
+      "url": "https://www.chinanews.com.cn/gn/2026/10-30/10723267.shtml",
+      "role": "historical_exposed_demo",
+      "template": "chinanews",
+      "source_sha256": "ce107f27354964c4f31b06b5a7731963e8b7edab9c228e07f23fbfd2c9a82c5d",
+      "status": "success",
+      "own_title": "公安部就修订《公安机关办理行政案件程序规定》公开征求意见",
+      "reference_title": "公安部就修订《公安机关办理行政案件程序规定》公开征求意见",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 503,
+        "candidate_chars": 401,
+        "char_ngram_precision": 1.0,
+        "char_ngram_recall": 0.7956,
+        "char_ngram_f1": 0.8862,
+        "exact_segment_matches": 7,
+        "sequence_ratio": 0.7,
+        "reference_only": [
+          "国内新闻精选: 2026年11月02日 10:19:41 2026年11月01日 13:59:13 2026年11月01日 13:39:22 2026年10月31日 14:37:20 2026年10月30日 17:44:45"
+        ],
+        "candidate_only": [],
+        "needs_manual_review": true,
+        "own_blocks": 7,
+        "reference_segments": 13
+      }
+    },
+    {
+      "id": "chinanews_02",
+      "group": "manifest",
+      "path": "samples/chinanews_02.html",
+      "url": "https://www.chinanews.com.cn/sh/2026/11-02/10724893.shtml",
+      "role": "historical_exposed_demo",
+      "template": "chinanews",
+      "source_sha256": "601ced823ca9912cacac2d0ddc3ae0e94f43f4b8b63a541f917d3e32a122aae5",
+      "status": "success",
+      "own_title": "追忆中国留学生蒋安桐：澳大利亚海滩舍己救人，三年后被追授“英勇行为嘉奖”",
+      "reference_title": "追忆中国留学生蒋安桐:澳大利亚海滩舍己救人,三年后被追授“英勇行为嘉奖”",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 1538,
+        "candidate_chars": 1553,
+        "char_ngram_precision": 0.9096,
+        "char_ngram_recall": 0.9185,
+        "char_ngram_f1": 0.914,
+        "exact_segment_matches": 23,
+        "sequence_ratio": 0.8214,
+        "reference_only": [
+          "中新网记者 薄雯雯",
+          "社会新闻精选: 2026年11月02日 18:14:21 2026年11月02日 15:51:47 2026年11月02日 15:30:16 2026年11月02日 13:40:42 2026年11月02日 11:35:59"
+        ],
+        "candidate_only": [
+          "当地时间10月29日,澳大利亚伍伦贡大学中国留学生蒋安桐追思会在伍伦贡举行。图为设立在伍伦贡大学校园内的蒋安桐纪念碑。 中新社记者 薄雯雯 摄",
+          "图为蒋安桐。 (受访者供图)",
+          "当地时间10月29日,伍伦贡大学师生及中澳各界人士向蒋安桐纪念碑献花。 中新社记者 薄雯雯 摄"
+        ],
+        "needs_manual_review": false,
+        "own_blocks": 26,
+        "reference_segments": 30
+      }
+    },
+    {
+      "id": "chinanews_03",
+      "group": "manifest",
+      "path": "samples/chinanews_03.html",
+      "url": "https://www.chinanews.com.cn/dxw/2026/11-03/10725312.shtml",
+      "role": "historical_exposed_demo",
+      "template": "chinanews",
+      "source_sha256": "1c9dea419228915c7358d39dbbdadb9771cf26d93e65887e4949ad21d4b09bb6",
+      "status": "success",
+      "own_title": "东西问丨伊扎特·萨阿德：全球南方现代化如何抓住AI机遇？",
+      "reference_title": "东西问丨伊扎特·萨阿德:全球南方现代化如何抓住AI机遇?",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 2031,
+        "candidate_chars": 2161,
+        "char_ngram_precision": 0.8832,
+        "char_ngram_recall": 0.9398,
+        "char_ngram_f1": 0.9106,
+        "exact_segment_matches": 29,
+        "sequence_ratio": 0.8406,
+        "reference_only": [
+          "中新社记者 孙翔",
+          "东西问精选: 2026年11月03日 15:05:01 2026年11月02日 21:47:10 2026年11月02日 20:47:45 2026年11月02日 20:33:56 2026年11月02日 13:38:14"
+        ],
+        "candidate_only": [
+          "哈萨克斯坦,阿斯塔纳世博园区的“Alem.AI”国际人工智能中心。展示的多款人形机器人。 (资料图)中新社记者 单璐 摄",
+          "2026年7月20日,上海,中国—金砖国家人工智能发展与合作中心‌吸引参观者。中新社发 陈玉宇 摄",
+          "当地时间9月30日,2026全球南方现代化论坛在埃及开罗举行,本次论坛主题是“人工智能浪潮:全球南方现代化的机遇与挑战”。图为“全球南方青年说”嘉宾分享人工智能助力发展案例。 中新社记者 孙翔 摄",
+          "埃及外交事务委员会主任伊扎特·萨阿德接受中新社“东西问”专访。中新社记者 孙翔 摄"
+        ],
+        "needs_manual_review": true,
+        "own_blocks": 33,
+        "reference_segments": 36
+      }
+    },
+    {
+      "id": "sina_01",
+      "group": "manifest",
+      "path": "samples/sina_01.html",
+      "url": "https://finance.sina.com.cn/stock/bxjj/2026-10-27/doc-iniwrkkw2082967.shtml",
+      "role": "historical_exposed_demo",
+      "template": "sina",
+      "source_sha256": "d2c40b3ca659fd59f83f427079f4ea6264b559f2b938d94014bd154cade22f84",
+      "status": "success",
+      "own_title": "宇树科技股价连续暴涨，分析师忙翻了！物理AI受益股梳理",
+      "reference_title": "宇树科技股价连续暴涨,分析师忙翻了!物理AI受益股梳理",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 4023,
+        "candidate_chars": 3896,
+        "char_ngram_precision": 1.0,
+        "char_ngram_recall": 0.9684,
+        "char_ngram_f1": 0.9839,
+        "exact_segment_matches": 43,
+        "sequence_ratio": 0.9348,
+        "reference_only": [
+          "责任编辑:石秀珍 SF183 新浪财经声明:此消息系转载自合作媒体,新浪财经登载此文出于传递更多信息之目的,文章内容仅供参考,不构成投资建议。 APP专享直播 热门推荐 收起 24小时滚动播报最新的财经资讯和视频,更多粉丝福利扫描二维码关注(sinafinance)"
+        ],
+        "candidate_only": [],
+        "needs_manual_review": false,
+        "own_blocks": 43,
+        "reference_segments": 49
+      }
+    },
+    {
+      "id": "sina_02",
+      "group": "manifest",
+      "path": "samples/sina_02.html",
+      "url": "https://finance.sina.com.cn/roll/2026-10-30/doc-iniwxzqf8395260.shtml",
+      "role": "historical_exposed_demo",
+      "template": "sina",
+      "source_sha256": "c655ca0fa14a9f65c87531dc4d1ede032149a796f4631b87cb0885c748e8e327",
+      "status": "success",
+      "own_title": "东方证券并购重组过会，华鑫股份易主 上海国资券商大棋局走到哪了？",
+      "reference_title": "东方证券并购重组过会,华鑫股份易主 上海国资券商大棋局走到哪了?",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 2359,
+        "candidate_chars": 2294,
+        "char_ngram_precision": 1.0,
+        "char_ngram_recall": 0.9724,
+        "char_ngram_f1": 0.986,
+        "exact_segment_matches": 23,
+        "sequence_ratio": 0.902,
+        "reference_only": [
+          "VIP课程推荐 APP专享直播 热门推荐 收起 24小时滚动播报最新的财经资讯和视频,更多粉丝福利扫描二维码关注(sinafinance)"
+        ],
+        "candidate_only": [],
+        "needs_manual_review": false,
+        "own_blocks": 23,
+        "reference_segments": 28
+      }
+    },
+    {
+      "id": "sina_03",
+      "group": "manifest",
+      "path": "samples/sina_03.html",
+      "url": "https://finance.sina.com.cn/wm/2026-10-30/doc-iniwxksk5906408.shtml",
+      "role": "historical_exposed_demo",
+      "template": "sina",
+      "source_sha256": "c6348f97447c665018d507e3ed78a99a2d0989b13bc60087bb075bc8680ce4c4",
+      "status": "success",
+      "own_title": "博盈特焊拟重大资产重组，周五复牌",
+      "reference_title": "博盈特焊拟重大资产重组,周五复牌",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 1419,
+        "candidate_chars": 1342,
+        "char_ngram_precision": 1.0,
+        "char_ngram_recall": 0.9456,
+        "char_ngram_f1": 0.972,
+        "exact_segment_matches": 16,
+        "sequence_ratio": 0.8421,
+        "reference_only": [
+          "(文章来源:上海证券报) VIP课程推荐 APP专享直播 热门推荐 收起 24小时滚动播报最新的财经资讯和视频,更多粉丝福利扫描二维码关注(sinafinance)"
+        ],
+        "candidate_only": [],
+        "needs_manual_review": false,
+        "own_blocks": 16,
+        "reference_segments": 22
+      }
+    },
+    {
+      "id": "pg_essay_01",
+      "group": "manifest",
+      "path": "samples/pg_essay_01.html",
+      "url": "https://www.paulgraham.com/avg.html",
+      "role": "historical_exposed_demo",
+      "template": "pg_essay",
+      "source_sha256": "beb172c328102098dfd5fda91dc86e8899e563f34cccb4bce285f6b0ff0d809b",
+      "status": "success",
+      "own_title": "Beating the Averages",
+      "reference_title": "Beating the Averages",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 20813,
+        "candidate_chars": 20734,
+        "char_ngram_precision": 0.9908,
+        "char_ngram_recall": 0.987,
+        "char_ngram_f1": 0.9889,
+        "exact_segment_matches": 0,
+        "sequence_ratio": 0.0,
+        "reference_only": [
+          "| April 2001, rev. April 2003 (This article is derived from a talk given at the 2001 Franz Developer Symposium.) In the summer of 1995, my friend Robert Morris and I started a startup called Viaweb. Our plan was to write software that would let end users build online stores. What was novel about thi"
+        ],
+        "candidate_only": [
+          "April 2001, rev. April 2003 (This article is derived from a talk given at the 2001 Franz Developer Symposium.) In the summer of 1995, my friend Robert Morris and I started a startup called Viaweb. Our plan was to write software that would let end users build online stores. What was novel about this "
+        ],
+        "needs_manual_review": false,
+        "own_blocks": 67,
+        "reference_segments": 7
+      }
+    },
+    {
+      "id": "pg_essay_02",
+      "group": "manifest",
+      "path": "samples/pg_essay_02.html",
+      "url": "https://www.paulgraham.com/wealth.html",
+      "role": "historical_exposed_demo",
+      "template": "pg_essay",
+      "source_sha256": "a5f0d6cd7f29d2724af1bfbe1efc66f1de79d16d7bd6ada9c2cb79f16cef51f3",
+      "status": "success",
+      "own_title": "How to Make Wealth",
+      "reference_title": "How to Make Wealth",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 40905,
+        "candidate_chars": 40903,
+        "char_ngram_precision": 1.0,
+        "char_ngram_recall": 1.0,
+        "char_ngram_f1": 1.0,
+        "exact_segment_matches": 0,
+        "sequence_ratio": 0.0,
+        "reference_only": [
+          "| May 2004 (This essay was originally published in Hackers & Painters.) If you wanted to get rich, how would you do it? I think your best bet would be to start or join a startup. That's been a reliable way to get rich for hundreds of years. The word \"startup\" dates from the 1960s, but what happens i"
+        ],
+        "candidate_only": [
+          "May 2004 (This essay was originally published in Hackers & Painters.) If you wanted to get rich, how would you do it? I think your best bet would be to start or join a startup. That's been a reliable way to get rich for hundreds of years. The word \"startup\" dates from the 1960s, but what happens in "
+        ],
+        "needs_manual_review": false,
+        "own_blocks": 141,
+        "reference_segments": 1
+      }
+    },
+    {
+      "id": "pg_essay_03",
+      "group": "manifest",
+      "path": "samples/pg_essay_03.html",
+      "url": "https://www.paulgraham.com/essay.html",
+      "role": "historical_exposed_demo",
+      "template": "pg_essay",
+      "source_sha256": "db1035122e22995ec251242bed7f89696f162ac8b6863cee0f220f367b2cd7b3",
+      "status": "success",
+      "own_title": "The Age of the Essay",
+      "reference_title": "The Age of the Essay",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 21547,
+        "candidate_chars": 21369,
+        "char_ngram_precision": 1.0,
+        "char_ngram_recall": 0.9917,
+        "char_ngram_f1": 0.9959,
+        "exact_segment_matches": 0,
+        "sequence_ratio": 0.0,
+        "reference_only": [
+          "| September 2004 Remember the essays you had to write in high school? Topic sentence, introductory paragraph, supporting paragraphs, conclusion. The conclusion being, say, that Ahab in Moby Dick was a Christ-like figure. Oy. So I'm going to try to give the other side of the story: what an essay real"
+        ],
+        "candidate_only": [
+          "September 2004 Remember the essays you had to write in high school? Topic sentence, introductory paragraph, supporting paragraphs, conclusion. The conclusion being, say, that Ahab in Moby Dick was a Christ-like figure. Oy. So I'm going to try to give the other side of the story: what an essay really"
+        ],
+        "needs_manual_review": false,
+        "own_blocks": 79,
+        "reference_segments": 5
+      }
+    },
+    {
+      "id": "pydoc_intro",
+      "group": "pydoc_tutorial",
+      "path": "samples/pydoc_intro.html",
+      "url": "https://docs.python.org/3/tutorial/introduction.html",
+      "role": "adaptation_candidate_unseen",
+      "template": "pydoc",
+      "source_sha256": "f59c9271286fda8e11785148a1d11d753c96bb622eb21a34768babefac5d53c7",
+      "status": "success",
+      "own_title": "3. Python 速览",
+      "reference_title": "3. Python 速览",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 6992,
+        "candidate_chars": 7155,
+        "char_ngram_precision": 0.9772,
+        "char_ngram_recall": 1.0,
+        "char_ngram_f1": 0.9885,
+        "exact_segment_matches": 72,
+        "sequence_ratio": 0.3445,
+        "reference_only": [
+          "# 这是第一条注释 spam = 1 # 而这是第二条注释 # ... 而这是第三条! text = \"# 这不是注释因为它是在引号之内。\"",
+          ">>> 2 + 2 4 >>> 50 - 5*6 20 >>> (50 - 5*6) / 4 5.0 >>> 8 / 5 # 除法运算总是返回一个浮点数 1.6",
+          ">>> 17 / 3 # 经典除法运算返回一个浮点数 5.666666666666667 >>> >>> 17 // 3 # 向下取整除法运算会丢弃小数部分 5 >>> 17 % 3 # % 运算返回相除的余数 2 >>> 5 * 3 + 2 # 向下取整的商 * 除数 + 余数 17",
+          ">>> 5 ** 2 # 5 的平方 25 >>> 2 ** 7 # 2 的 7 次方 128",
+          ">>> width = 20 >>> height = 5 * 9 >>> width * height 900"
+        ],
+        "candidate_only": [
+          "# 这是第一条注释 spam = 1 # 而这是第二条注释 # ... 而这是第三条! text = \"# 这不是注释因为它是在引号之内。\"",
+          ">>> 2 + 2 4 >>> 50 - 5*6 20 >>> (50 - 5*6) / 4 5.0 >>> 8 / 5 # 除法运算总是返回一个浮点数 1.6",
+          ">>> 17 / 3 # 经典除法运算返回一个浮点数 5.666666666666667 >>> >>> 17 // 3 # 向下取整除法运算会丢弃小数部分 5 >>> 17 % 3 # % 运算返回相除的余数 2 >>> 5 * 3 + 2 # 向下取整的商 * 除数 + 余数 17",
+          ">>> 5 ** 2 # 5 的平方 25 >>> 2 ** 7 # 2 的 7 次方 128",
+          ">>> width = 20 >>> height = 5 * 9 >>> width * height 900"
+        ],
+        "needs_manual_review": false,
+        "own_blocks": 115,
+        "reference_segments": 303
+      }
+    },
+    {
+      "id": "pydoc_data",
+      "group": "pydoc_tutorial",
+      "path": "samples/pydoc_data.html",
+      "url": "https://docs.python.org/3/tutorial/datastructures.html",
+      "role": "adaptation_candidate_unseen",
+      "template": "pydoc",
+      "source_sha256": "c5923c644fd516e3b76b2372a7d80075582d809648877aeee0c33a72a536e401",
+      "status": "success",
+      "own_title": "5. 数据结构",
+      "reference_title": "5. 数据结构",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 11266,
+        "candidate_chars": 11355,
+        "char_ngram_precision": 0.9918,
+        "char_ngram_recall": 0.9996,
+        "char_ngram_f1": 0.9957,
+        "exact_segment_matches": 109,
+        "sequence_ratio": 0.3893,
+        "reference_only": [
+          "返回列表中 value 首次出现所在的从零开始的索引。 如无此条目则会引发 ValueError。 可选参数 start 和 end 是切片符号,用于将搜索限制为列表的特定子序列。返回的索引是相对于整个序列的开始计算的,而不是 start 参数。",
+          ">>> fruits = ['orange', 'apple', 'pear', 'banana', 'kiwi', 'apple', 'banana'] >>> fruits.count('apple') 2 >>> fruits.count('tangerine') 0 >>> fruits.index('banana') 3 >>> fruits.index('banana', 4) # 从 4 号位开始查找下一个 banana 6 >>> fruits.reverse() >>> fruits ['banana', 'apple', 'kiwi', 'banana', 'pear', ",
+          ">>> stack = [3, 4, 5] >>> stack.append(6) >>> stack.append(7) >>> stack [3, 4, 5, 6, 7] >>> stack.pop() 7 >>> stack [3, 4, 5, 6] >>> stack.pop() 6 >>> stack.pop() 5 >>> stack [3, 4]",
+          ">>> from collections import deque >>> queue = deque([\"Eric\", \"John\", \"Michael\"]) >>> queue.append(\"Terry\") # Terry 到了 >>> queue.append(\"Graham\") # Graham 到了 >>> queue.popleft() # 第一个到的现在走了 'Eric' >>> queue.popleft() # 第二个到的现在走了 'John' >>> queue # 按到达顺序排列的剩余队列 deque(['Michael', 'Terry', 'Graham'])",
+          ">>> squares = [] >>> for x in range(10): ... squares.append(x**2) ... >>> squares [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]"
+        ],
+        "candidate_only": [
+          "返回列表中 value 首次出现所在的从零开始的索引。 如无此条目则会引发 ValueError。 可选参数 start 和 end 是切片符号,用于将搜索限制为列表的特定子序列。返回的索引是相对于整个序列的开始计算的,而不是 start 参数。",
+          ">>> fruits = ['orange', 'apple', 'pear', 'banana', 'kiwi', 'apple', 'banana'] >>> fruits.count('apple') 2 >>> fruits.count('tangerine') 0 >>> fruits.index('banana') 3 >>> fruits.index('banana', 4) # 从 4 号位开始查找下一个 banana 6 >>> fruits.reverse() >>> fruits ['banana', 'apple', 'kiwi', 'banana', 'pear', ",
+          ">>> stack = [3, 4, 5] >>> stack.append(6) >>> stack.append(7) >>> stack [3, 4, 5, 6, 7] >>> stack.pop() 7 >>> stack [3, 4, 5, 6] >>> stack.pop() 6 >>> stack.pop() 5 >>> stack [3, 4]",
+          ">>> from collections import deque >>> queue = deque([\"Eric\", \"John\", \"Michael\"]) >>> queue.append(\"Terry\") # Terry 到了 >>> queue.append(\"Graham\") # Graham 到了 >>> queue.popleft() # 第一个到的现在走了 'Eric' >>> queue.popleft() # 第二个到的现在走了 'John' >>> queue # 按到达顺序排列的剩余队列 deque(['Michael', 'Terry', 'Graham'])",
+          ">>> squares = [] >>> for x in range(10): ... squares.append(x**2) ... >>> squares [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]"
+        ],
+        "needs_manual_review": false,
+        "own_blocks": 148,
+        "reference_segments": 412
+      }
+    },
+    {
+      "id": "pydoc_control",
+      "group": "pydoc_tutorial",
+      "path": "samples/pydoc_control.html",
+      "url": "https://docs.python.org/3/tutorial/controlflow.html",
+      "role": "adaptation_candidate_unseen",
+      "template": "pydoc",
+      "source_sha256": "d02eef35346d0344e101a66c2466ae9755a4bf45f6f6c1d94574f1ab8a43f8ce",
+      "status": "success",
+      "own_title": "4. 更多控制流工具",
+      "reference_title": "4. 更多控制流工具",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 15486,
+        "candidate_chars": 15545,
+        "char_ngram_precision": 0.9962,
+        "char_ngram_recall": 1.0,
+        "char_ngram_f1": 0.9981,
+        "exact_segment_matches": 147,
+        "sequence_ratio": 0.3946,
+        "reference_only": [
+          ">>> x = int(input(\"Please enter an integer: \")) Please enter an integer: 42 >>> if x < 0: ... x = 0 ... print('Negative changed to zero') ... elif x == 0: ... print('Zero') ... elif x == 1: ... print('Single') ... else: ... print('More') ... More",
+          ">>> # 度量一些字符串: >>> words = ['cat', 'window', 'defenestrate'] >>> for w in words: ... print(w, len(w)) ... cat 3 window 6 defenestrate 12",
+          "# 创建示例多项集 users = {'Hans': 'active', 'Éléonore': 'inactive', '景太郎': 'active'} # 策略:迭代一个副本 for user, status in users.copy().items(): if status == 'inactive': del users[user] # 策略:创建一个新多项集 active_users = {} for user, status in users.items(): if status == 'active': active_users[user] = status",
+          ">>> for i in range(5): ... print(i) ... 0 1 2 3 4",
+          ">>> list(range(5, 10)) [5, 6, 7, 8, 9] >>> list(range(0, 10, 3)) [0, 3, 6, 9] >>> list(range(-10, -100, -30)) [-10, -40, -70]"
+        ],
+        "candidate_only": [
+          ">>> x = int(input(\"Please enter an integer: \")) Please enter an integer: 42 >>> if x < 0: ... x = 0 ... print('Negative changed to zero') ... elif x == 0: ... print('Zero') ... elif x == 1: ... print('Single') ... else: ... print('More') ... More",
+          ">>> # 度量一些字符串: >>> words = ['cat', 'window', 'defenestrate'] >>> for w in words: ... print(w, len(w)) ... cat 3 window 6 defenestrate 12",
+          "# 创建示例多项集 users = {'Hans': 'active', 'Éléonore': 'inactive', '景太郎': 'active'} # 策略:迭代一个副本 for user, status in users.copy().items(): if status == 'inactive': del users[user] # 策略:创建一个新多项集 active_users = {} for user, status in users.items(): if status == 'active': active_users[user] = status",
+          ">>> for i in range(5): ... print(i) ... 0 1 2 3 4",
+          ">>> list(range(5, 10)) [5, 6, 7, 8, 9] >>> list(range(0, 10, 3)) [0, 3, 6, 9] >>> list(range(-10, -100, -30)) [-10, -40, -70]"
+        ],
+        "needs_manual_review": false,
+        "own_blocks": 203,
+        "reference_segments": 542
+      }
+    },
+    {
+      "id": "pydoc_library_index",
+      "group": "pydoc_tutorial",
+      "path": "samples/pydoc_library_index.html",
+      "url": "https://docs.python.org/zh-cn/3/library/index.html",
+      "role": "holdout_unseen",
+      "template": "pydoc",
+      "source_sha256": "9cb748bbfd547a80922467dbbbe58816d0d80500818b19ec18a72ae02fb9d152",
+      "status": "success",
+      "own_title": "Python 标准库",
+      "reference_title": "Python 标准库",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 488,
+        "candidate_chars": 5999,
+        "char_ngram_precision": 0.0807,
+        "char_ngram_recall": 1.0,
+        "char_ngram_f1": 0.1494,
+        "exact_segment_matches": 5,
+        "sequence_ratio": 0.2273,
+        "reference_only": [],
+        "candidate_only": [
+          "概述 可用性注释 文本处理服务 string --- 常见的字符串操作 string.templatelib --- 对模板字符串字面值的支持 re --- 正则表达式操作 difflib --- 计算差异的辅助工具 textwrap --- 文本自动换行与填充 unicodedata --- Unicode 数据库 stringprep --- 因特网字符串预处理 readline --- GNU readline 接口 rlcompleter --- 用于 GNU readline 的补全函数 二进制数据服务 struct --- 将字节串解读为打包的二进制数据 codecs --- 编解"
+        ],
+        "needs_manual_review": true,
+        "own_blocks": 39,
+        "reference_segments": 5
+      }
+    },
+    {
+      "id": "pydoc_interpreter",
+      "group": "pydoc_tutorial",
+      "path": "samples/pydoc_interpreter.html",
+      "url": "https://docs.python.org/zh-cn/3/tutorial/interpreter.html",
+      "role": "holdout_unseen",
+      "template": "pydoc",
+      "source_sha256": "6b642cd0f2f0eb4d8d72b300434415fde357331d9ec5059e4b67c6b2580f56d5",
+      "status": "success",
+      "own_title": "2. 使用 Python 的解释器",
+      "reference_title": "2. 使用 Python 的解释器",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 2066,
+        "candidate_chars": 2129,
+        "char_ngram_precision": 0.9704,
+        "char_ngram_recall": 1.0,
+        "char_ngram_f1": 0.985,
+        "exact_segment_matches": 28,
+        "sequence_ratio": 0.7778,
+        "reference_only": [
+          "$ python3.15 Python 3.15 (default, May 7 2025, 15:46:04) [GCC 10.2.0] on linux Type \"help\", \"copyright\", \"credits\" or \"license\" for more information. >>>",
+          ">>> the_world_is_flat = True >>> if the_world_is_flat: ... print(\"Be careful not to fall off!\") ... Be careful not to fall off!",
+          "#!/usr/bin/env python3 # -*- coding: cp1252 -*-"
+        ],
+        "candidate_only": [
+          "$ python3.15 Python 3.15 (default, May 7 2025, 15:46:04) [GCC 10.2.0] on linux Type \"help\", \"copyright\", \"credits\" or \"license\" for more information. >>>",
+          ">>> the_world_is_flat = True >>> if the_world_is_flat: ... print(\"Be careful not to fall off!\") ... Be careful not to fall off!",
+          "#!/usr/bin/env python3 # -*- coding: cp1252 -*-",
+          "[1] Unix 系统中,为了不与同时安装的 Python 2.x 冲突,Python 3.x 解释器默认安装的执行文件名不是 python。"
+        ],
+        "needs_manual_review": false,
+        "own_blocks": 32,
+        "reference_segments": 40
+      }
+    },
+    {
+      "id": "pydoc_appetite",
+      "group": "pydoc_tutorial",
+      "path": "samples/pydoc_appetite.html",
+      "url": "https://docs.python.org/zh-cn/3/tutorial/appetite.html",
+      "role": "holdout_unseen",
+      "template": "pydoc",
+      "source_sha256": "faa9db0798aeec25b68bf0703511ea6a73b6cff0c34895a3f9005f055b05eeea",
+      "status": "success",
+      "own_title": "1. 课前甜点",
+      "reference_title": "1. 课前甜点",
+      "comparison": {
+        "title_match": true,
+        "reference_chars": 1365,
+        "candidate_chars": 1365,
+        "char_ngram_precision": 1.0,
+        "char_ngram_recall": 1.0,
+        "char_ngram_f1": 1.0,
+        "exact_segment_matches": 16,
+        "sequence_ratio": 1.0,
+        "reference_only": [],
+        "candidate_only": [],
+        "needs_manual_review": false,
+        "own_blocks": 16,
+        "reference_segments": 16
+      }
+    }
+  ]
+}

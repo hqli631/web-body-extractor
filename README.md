@@ -33,7 +33,9 @@ py -3 -m venv .venv
 - output/results.json：结构化抽取结果及运行状态。
 - reports/index.html：便于阅读的效果报告。
 
-当前验收结果：9篇样例提取成功、9篇与历史基准一致，8项回归测试通过。具体口径与限制见 [效果评测与验收](reports/EVALUATION.md)。这不是未见网页的语义准确率。
+另外运行 Trafilatura 外部基线对照时，会生成 output/trafilatura_comparison.json、output/trafilatura_reference/ 和 reports/trafilatura_comparison.html。
+
+当前验收结果：9篇主回归样例提取成功并与历史基准一致，14项测试通过；Trafilatura 对照覆盖15页、0个运行错误。具体口径与限制见 [效果评测与验收](reports/EVALUATION.md)。这不是未见网页的语义准确率。
 
 运行后打开报告：
 
@@ -89,16 +91,21 @@ Start-Process ".\reports\index.html"
 |rules/|按布局组织的 Python/XPath 规则实现|
 |samples/|本地 HTML 演示与回归样例|
 |samples/manifest.json|样例、来源、布局和版本等登记信息|
+|samples/pydoc_manifest.json|Python官方 Sphinx 文档的适配与留出样例清单|
 |samples/baseline.json|固定历史结果，用于发现规则修改造成的变化|
-|requirements.txt|本项目依赖，核心为 lxml|
+|trafilatura_baseline.py|调用 Trafilatura、规范化文本并生成外部基线对照|
+|requirements.txt|本项目依赖，核心为 lxml 和固定版本的 trafilatura|
 |run.bat|Windows 快速安装与批处理入口|
 |tests/|规则和输出协议的回归测试|
 |output/|生成的结构化结果|
+|output/trafilatura_reference/|每页 Trafilatura 原始 JSON 结果，便于复核|
 |reports/|可阅读的效果报告|
 |reports/EVALUATION.md|本次验收结果、复验方法和评测限制|
+|reports/trafilatura_comparison.html|可阅读的外部基线对照报告|
 |docs/PROVENANCE.json|规则来源版本和文件哈希|
 |docs/LEARNING_GUIDE.md|具体知识点与学习操作|
 |docs/SCOPE.md|支持范围、样例来源和评测边界|
+|docs/TRAFILATURA_BASELINE.md|基线方法、结果、差异解释和经验总结|
 
 以实际目录和 --help 输出为准，规则文件用途也可直接阅读其模块说明。
 
@@ -121,8 +128,27 @@ Start-Process ".\reports\index.html"
 
 本项目未接入任意网站的自动采集服务。阅读和保存公开网页时应遵守目标网站的访问规则。
 
-## 8．适合简历怎样写
+## 8．Trafilatura 外部基线对照
 
-可据实描述：使用 Python、lxml 和 XPath 实现新闻与博客多布局正文提取，输出标题、有序正文、元数据及原文定位证据，支持批处理、效果报告和回归检查；分析署名误入正文、图说遗漏和布局变体等问题。
+为了给规则结果增加一个独立参照，项目固定使用 [adbar/trafilatura](https://github.com/adbar/trafilatura) 作为传统正文提取基线。执行：
+
+~~~powershell
+.\.venv\Scripts\python.exe -X utf8 .\app.py baseline
+~~~
+
+默认读取主回归清单和 Python 文档清单，共15页。对照会：
+
+- 对每页保存 Trafilatura 的 JSON 原始结果；
+- 按字符 5-gram 计算精确率、召回率和 F1；
+- 同时报告标题是否一致、文本块数和需要人工核查的页面；
+- 生成 output/trafilatura_comparison.json、reports/trafilatura_comparison.html 和 reports/trafilatura_comparison.md。
+
+当前结果为15/15页成功运行、15/15标题一致、平均字符 5-gram F1 为0.9169，其中3页因差异较大标记为需核查。低分不一定表示我们的结果错误：例如 pydoc_library_index 是“标准库总目录”，Trafilatura只保留导语，我们的规则保留了目录列表，F1因此很低。相反，Trafilatura也会在新浪和中新网样例中加入推荐列表、责任编辑或其他页面组件。
+
+Trafilatura是外部参照，不是人工金标。它只能说明“两个抽取器的输出差异在哪里”，不能自动决定哪个结果更符合语义。出现差异时必须回到原始 HTML、规则意图和页面类型判断。完整方法与经验见 [Trafilatura外部基线说明](docs/TRAFILATURA_BASELINE.md)。
+
+## 9．适合简历怎样写
+
+可据实描述：使用 Python、lxml 和 XPath 实现新闻、博客和 Python 文档的多布局正文提取，输出标题、有序正文、元数据及原文定位证据，支持批处理、效果报告和回归检查；接入 Trafilatura 外部基线进行字符级对照，并分析基线遗漏目录、带入推荐列表、分块口径不同等问题。
 
 不要把本项目描述为任意网页通用抽取、生产级海量系统或高准确率模型。模型训练、API Agent、自我修复和 Rubrics 模型评审属于原项目其他模块，本文件夹聚焦项目一。

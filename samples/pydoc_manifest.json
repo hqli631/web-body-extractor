@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "group": "pydoc_tutorial",
+  "scope": "6 Python official Sphinx documentation pages: three adaptation pages plus three frozen holdout pages (library index, interpreter, appetite). Not part of the original regression baseline.",
+  "pages": [
+    {
+      "id": "pydoc_intro",
+      "path": "samples/pydoc_intro.html",
+      "template": "pydoc",
+      "url": "https://docs.python.org/3/tutorial/introduction.html",
+      "sha256": "f59c9271286fda8e11785148a1d11d753c96bb622eb21a34768babefac5d53c7",
+      "role": "adaptation_candidate_unseen",
+      "original_path": "offline_web_extractor/samples/clustering/python-introduction.html"
+    },
+    {
+      "id": "pydoc_data",
+      "path": "samples/pydoc_data.html",
+      "template": "pydoc",
+      "url": "https://docs.python.org/3/tutorial/datastructures.html",
+      "sha256": "c5923c644fd516e3b76b2372a7d80075582d809648877aeee0c33a72a536e401",
+      "role": "adaptation_candidate_unseen",
+      "original_path": "offline_web_extractor/samples/clustering/python-datastructures.html"
+    },
+    {
+      "id": "pydoc_control",
+      "path": "samples/pydoc_control.html",
+      "template": "pydoc",
+      "url": "https://docs.python.org/3/tutorial/controlflow.html",
+      "sha256": "d02eef35346d0344e101a66c2466ae9755a4bf45f6f6c1d94574f1ab8a43f8ce",
+      "role": "adaptation_candidate_unseen",
+      "original_path": "offline_web_extractor/samples/clustering/python-controlflow.html"
+    },
+    {
+      "id": "pydoc_library_index",
+      "path": "samples/pydoc_library_index.html",
+      "template": "pydoc",
+      "url": "https://docs.python.org/zh-cn/3/library/index.html",
+      "sha256": "9cb748bbfd547a80922467dbbbe58816d0d80500818b19ec18a72ae02fb9d152",
+      "role": "holdout_unseen",
+      "original_path": "offline_web_extractor/samples/clustering/python-library-index.html"
+    },
+    {
+      "id": "pydoc_interpreter",
+      "path": "samples/pydoc_interpreter.html",
+      "template": "pydoc",
+      "url": "https://docs.python.org/zh-cn/3/tutorial/interpreter.html",
+      "sha256": "6b642cd0f2f0eb4d8d72b300434415fde357331d9ec5059e4b67c6b2580f56d5",
+      "role": "holdout_unseen",
+      "original_path": "offline_web_extractor/samples/python_interpreter_zh.html"
+    },
+    {
+      "id": "pydoc_appetite",
+      "path": "samples/pydoc_appetite.html",
+      "template": "pydoc",
+      "url": "https://docs.python.org/zh-cn/3/tutorial/appetite.html",
+      "sha256": "faa9db0798aeec25b68bf0703511ea6a73b6cff0c34895a3f9005f055b05eeea",
+      "role": "holdout_unseen",
+      "original_path": "offline_web_extractor/samples/python_appetite_zh.html"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at_utc": "2026-11-15T15:45:17.727705+00:00",
+  "generated_at_utc": "2026-11-16T15:16:51.070898+00:00",
   "scope": "9 historical exposed natural pages, 3 adapted layouts; functional regression, not unseen semantic accuracy",
   "samples": 9,
   "extraction_passed": 9,
@@ -81,7 +81,7 @@
           "static_dom_only_no_css_visibility_javascript_or_ocr"
         ]
       },
-      "seconds": 0.028531600022688508,
+      "seconds": 0.03083639999385923,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -256,7 +256,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.02663159999065101,
+      "seconds": 0.028483300004154444,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -466,7 +466,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.02936260000569746,
+      "seconds": 0.027988599962554872,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -726,7 +726,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.017490800004452467,
+      "seconds": 0.018071500002406538,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -870,7 +870,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.008175200026016682,
+      "seconds": 0.008765799982938915,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -985,7 +985,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.008445999992545694,
+      "seconds": 0.007974499952979386,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -1349,7 +1349,7 @@
           "images_present_pixels_not_extracted_completeness_unknown"
         ]
       },
-      "seconds": 0.013448400015477091,
+      "seconds": 0.012921399960760027,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -2083,7 +2083,7 @@
           "images_present_pixels_not_extracted_completeness_unknown"
         ]
       },
-      "seconds": 0.054726700007449836,
+      "seconds": 0.0525832999846898,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -2500,7 +2500,7 @@
           "static_dom_only_no_ocr_or_javascript; container_xpath_evidence_for_text_segments; dates_and_notes_kept_in_body; legacy_br_segmentation_heuristic"
         ]
       },
-      "seconds": 0.015130500018130988,
+      "seconds": 0.014830100000835955,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     }

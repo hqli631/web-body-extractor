@@ -1,6 +1,30 @@
 {
   "source_repository": "https://github.com/hqli631/web_extract_demo",
   "source_commit": "3cfa8a3",
+  "external_baseline": {
+    "repository": "https://github.com/adbar/trafilatura",
+    "package": "trafilatura",
+    "version": "2.3.1",
+    "license_expression": "Apache-2.0",
+    "implementation": "trafilatura_baseline.py",
+    "settings": {
+      "fast": false,
+      "no_fallback": false,
+      "favor_precision": false,
+      "favor_recall": false,
+      "include_comments": false,
+      "include_tables": true,
+      "include_images": false,
+      "include_links": false,
+      "include_formatting": false
+    },
+    "generated_evidence": [
+      "output/trafilatura_comparison.json",
+      "output/trafilatura_reference/",
+      "reports/trafilatura_comparison.html",
+      "reports/trafilatura_comparison.md"
+    ]
+  },
   "copied_rule_sources": [
     {
       "source_path": "learning/generated/sina_v2.py",

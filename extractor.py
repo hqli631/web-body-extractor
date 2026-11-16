@@ -1,13 +1,19 @@
 """Rule routing and evidence validation for adapted static article layouts."""
 from lxml import html
-from rules import sina, chinanews, pg_essay
+from rules import sina, chinanews, pg_essay, pydoc
 
 SELECTORS = {
     'sina': "//div[@id='artibody']",
     'chinanews': "//div[contains(concat(' ',normalize-space(@class),' '),' left_zw ')]",
     'pg_essay': "//td[@width='435']/font[@size='2' and @face='verdana']",
+    'pydoc': "//*[@role='main']",
 }
-EXTRACTORS = {'sina': sina.extract, 'chinanews': chinanews.extract, 'pg_essay': pg_essay.extract}
+EXTRACTORS = {
+    'sina': sina.extract,
+    'chinanews': chinanews.extract,
+    'pg_essay': pg_essay.extract,
+    'pydoc': pydoc.extract,
+}
 
 def detect_template(tree):
     matches = [key for key, xpath in SELECTORS.items() if tree.xpath(xpath)]
@@ -41,7 +47,9 @@ def validate_result(result, data):
             if not isinstance(block, dict) or not all(isinstance(block.get(k), str) and block[k] for k in ('kind','xpath')) or not isinstance(block.get('text'),str) or (key != 'excluded' and not block['text']):
                 issues.append(key + '_invalid_entry')
                 continue
-            if key == 'blocks' and block['kind'] not in {'paragraph','subheading','caption','table'}:
+            if key == 'blocks' and block['kind'] not in {
+                    'paragraph', 'subheading', 'caption', 'table', 'code_block',
+                    'list_item', 'definition_term', 'definition_description', 'footnote'}:
                 issues.append('unsupported_body_kind')
             try:
                 nodes = tree.xpath(block['xpath'])
