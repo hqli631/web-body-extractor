@@ -45,9 +45,10 @@ class TrafilaturaBaselineHelpers(unittest.TestCase):
         self.assertEqual(baseline.block_similarity(">>> 2 + 2 4 >>> 50 - 5*6 20", ">>> 2 + 2 4 >>> 50 - 5*6 20"), 1.0)
 
     def test_segment_alignment_counts_small_string_difference_as_approximate_match(self):
+        text = "The quick brown fox jumps over the lazy dog"
         alignment = baseline.segment_alignment(
-            ["What an essay real"],
-            ["What an essay really"],
+            [text],
+            [text + "."],
         )
         self.assertEqual(alignment["exact_block_matches"], 0)
         self.assertEqual(alignment["approximate_block_matches"], 2)
@@ -73,12 +74,26 @@ class TrafilaturaBaselineHelpers(unittest.TestCase):
         self.assertEqual(len(alignment["candidate_only"]), 1)
 
     def test_segment_alignment_threshold_is_inclusive(self):
-        left = "abcdefghij"
-        right = "abcdefghik"
-        self.assertEqual(round(baseline.block_similarity(left, right), 4), 0.9)
+        left = "abcdefghijklmnopqrst"
+        right = "abcdefghijklmnopqrsu"
+        self.assertEqual(round(baseline.block_similarity(left, right), 4), 0.95)
         boundary = baseline.segment_alignment([left], [right])
         self.assertEqual(boundary["approximate_block_matches"], 2)
         self.assertEqual(boundary["unmatched_reference"], 0)
+
+    def test_classified_page_information_participates_in_block_alignment(self):
+        result = {
+            "blocks": [{"text": "正文内容"}],
+            "metadata": [{"kind": "editor", "text": "责任编辑：石秀珍 SF183"}],
+        }
+        candidate_segments = baseline.own_alignment_segments(result)
+        self.assertEqual(candidate_segments, ["正文内容", "责任编辑:石秀珍 SF183"])
+        alignment = baseline.segment_alignment(
+            ["责任编辑:石秀珍 SF183"],
+            candidate_segments,
+        )
+        self.assertEqual(alignment["exact_block_matches"], 1)
+        self.assertEqual(alignment["unmatched_reference"], 0)
 
     def test_segment_alignment_allows_one_long_reference_to_cover_many_blocks(self):
         reference = ["alpha beta gamma delta epsilon zeta eta theta iota kappa"]
@@ -154,6 +169,7 @@ class TrafilaturaBaselineHelpers(unittest.TestCase):
             self.assertEqual(payload["summary"]["review_count"], 0)
             self.assertIn("average_block_f1", payload["summary"])
             self.assertIn("block_match_threshold", payload)
+            self.assertEqual(payload["block_match_threshold"], 0.95)
             self.assertNotIn("approximate_pairs", payload["pages"][0]["comparison"])
             self.assertTrue((reference_dir / "pydoc_appetite.json").exists())
             self.assertTrue(report.exists())

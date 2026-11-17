@@ -135,7 +135,7 @@ def build_report(report, destination):
                 section += '<details><summary>XPath原文定位</summary><code>'+escape(block['xpath'])+'</code></details></li>'
             section += '</ol>'
         sections.append(section+'<p><a href="#top">返回汇总</a></p></section>')
-    page = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>项目一 · XPath规则抽取报告</title><style>body{font:16px/1.7 system-ui,sans-serif;max-width:1120px;margin:28px auto;padding:0 20px;color:#18314a}table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border:1px solid #ccd6e0;padding:8px;text-align:left;vertical-align:top}section{margin-top:32px;border-top:2px solid #ccd6e0;padding-top:16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f4f8;padding:16px}code{overflow-wrap:anywhere}.kind{background:#eaf1fa;padding:3px 8px}li{margin-bottom:16px}.note{background:#fff4d8;padding:16px}a{color:#185ca2}.metrics{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;margin:16px 0}.metric{background:#f1f4f8;border-left:4px solid #185ca2;padding:10px}.metric strong{display:block;font-size:1.35rem}@media(max-width:760px){.metrics{grid-template-columns:1fr 1fr}}</style>'
+    page = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>项目一 · XPath规则抽取报告</title><style>body{font:16px/1.7 system-ui,sans-serif;max-width:1120px;margin:28px auto;padding:0 20px;color:#18314a}table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border:1px solid #ccd6e0;padding:8px;text-align:left;vertical-align:top}section{margin-top:32px;border-top:2px solid #ccd6e0;padding-top:16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f4f8;padding:16px}code{overflow-wrap:anywhere}.kind{background:#eaf1fa;padding:3px 8px}li{margin-bottom:16px}a{color:#185ca2}.metrics{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;margin:16px 0}.metric{background:#f1f4f8;border-left:4px solid #185ca2;padding:10px}.metric strong{display:block;font-size:1.35rem}@media(max-width:760px){.metrics{grid-template-columns:1fr 1fr}}</style>'
     baseline_report = destination / 'trafilatura_comparison.html'
     if baseline_report.exists():
         summary = load_trafilatura_summary() or {}
@@ -157,8 +157,7 @@ def build_report(report, destination):
             '</div>' + baseline_link
         )
     else:
-        baseline_metrics = ('<h2>结果与Trafilatura外部基线对照</h2>'
-                            '<p class="note">对照报告尚未生成；运行 <code>app.py baseline</code> 后会在此处显示汇总指标和入口。</p>')
+        baseline_metrics = '<h2>结果与Trafilatura外部基线对照</h2>'
     page += '<h1 id="top">项目一：基于XPath的规则化网页内容提取</h1><p>样本 '+str(report['samples'])+'；提取及证据检查通过 '+str(report['extraction_passed'])+'；与固定历史回归基准一致 '+str(report['baseline_matches'])+'。</p>'+baseline_metrics+'<table><tr><th>样本</th><th>模板</th><th>状态</th><th>正文块</th><th>页面信息</th><th>排除项</th><th>历史基准</th></tr>'+''.join(rows)+'</table>'+''.join(sections)+'</html>'
     (destination/'index.html').write_text(page,encoding='utf8')
 

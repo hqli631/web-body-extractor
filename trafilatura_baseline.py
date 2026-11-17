@@ -32,10 +32,10 @@ TRAFILATURA_SETTINGS = {
 }
 
 # A block is treated as an approximate match when its whitespace-compacted text
-# is at least 90 percent covered by the opposite blocks, or a length-comparable
-# local block reaches 90 percent character similarity. The threshold is kept
+# is at least 95 percent covered by the opposite blocks, or a length-comparable
+# local block reaches 95 percent character similarity. The threshold is kept
 # explicit so formatting noise does not silently become an extraction error.
-BLOCK_MATCH_THRESHOLD = 0.90
+BLOCK_MATCH_THRESHOLD = 0.95
 
 
 def read_json(path):
@@ -124,6 +124,17 @@ def reference_segments(payload, own_title):
 
 def own_segments(result):
     return [normalize_text(block["text"]) for block in result["blocks"] if normalize_text(block["text"])]
+
+
+def own_alignment_segments(result):
+    """Return body text plus classified page information for block alignment."""
+    segments = own_segments(result)
+    segments.extend(
+        normalize_text(item["text"])
+        for item in result.get("metadata", [])
+        if normalize_text(item.get("text"))
+    )
+    return segments
 
 
 def block_similarity(left, right):
@@ -369,8 +380,8 @@ def compare_manifest_pages(manifest_paths, output_path, report_path, reference_d
                 reference_title = normalize_text(reference.get("title", ""))
                 segments = reference_segments(reference, own["title"])
                 reference_text = "\n".join(segments)
-                candidate_segments = own_segments(own)
-                candidate_text = "\n".join(candidate_segments)
+                candidate_text = "\n".join(own_segments(own))
+                candidate_segments = own_alignment_segments(own)
                 comparison = compare_texts(own["title"], reference_title, reference_text, candidate_text)
                 comparison.update(segment_alignment(segments, candidate_segments))
                 comparison["needs_manual_review"] = needs_manual_review(comparison)
@@ -432,15 +443,17 @@ def compare_manifest_pages(manifest_paths, output_path, report_path, reference_d
         trafilatura_version=getattr(trafilatura, "__version__", None),
         settings=TRAFILATURA_SETTINGS,
         comparison_method=(
-            "normalized body segments; whole-page 5-character n-gram precision, recall and F1; "
+            "normalized body text for whole-page 5-character n-gram precision, recall and F1; "
+            "body segments plus classified page information for block alignment; "
             "block alignment counts exact matches and approximate matches whose compacted text is "
             "covered by the opposite full text or locally similar at character similarity >= "
             + format(BLOCK_MATCH_THRESHOLD, ".2f")
             + "; no manual adjudication"
         ),
         block_alignment_method=(
-            "Each block is evaluated independently against the opposite full set of blocks so merged "
-            "or split segmentation does not have to form a one-to-one pair."
+            "Each body or classified page-information segment is evaluated independently against "
+            "the opposite full set of baseline segments so merged or split segmentation does not "
+            "have to form a one-to-one pair."
         ),
         block_match_threshold=BLOCK_MATCH_THRESHOLD,
         caveat="Trafilatura is an external baseline, not absolute ground truth. It can include page furniture or omit content.",
@@ -495,7 +508,7 @@ def build_html(report, destination):
             "<p>我们标题：" + escape(page.get("own_title", "")) + "；Trafilatura 标题："
             + escape(page.get("reference_title", "")) + "。</p>"
             "<p>已分离页面信息：" + str(comparison["own_metadata"]) + " 条（"
-            + escape(metadata_kinds) + "）；这些记录不进入正文字符F1。</p>"
+            + escape(metadata_kinds) + "）；页面信息参与块级对齐，正文字符F1仍只统计正文块。</p>"
             "<p>字符数：" + str(comparison["candidate_chars"]) + " / 基线 "
             + str(comparison["reference_chars"]) + "；精确率/召回率/F1："
             + format(comparison["char_ngram_precision"], ".3f") + " / "
@@ -510,8 +523,6 @@ def build_html(report, destination):
             + "；块级匹配精确率/召回率/F1：" + format(comparison["block_precision"], ".3f") + " / "
             + format(comparison["block_recall"], ".3f") + " / "
             + format(comparison["block_f1"], ".3f") + "。</p>"
-            "<p class=\"note\">达到阈值的近似匹配只计数，不展开原文，也不计入未匹配差异；"
-            "未匹配列表仅保留没有对应内容的文本块。</p>"
             "<div class=\"diff\"><div><h3>未匹配的 Trafilatura 基线块</h3><ul>"
             + (reference_only or "<li>无</li>") + "</ul></div><div><h3>未匹配的规则提取块</h3><ul>"
             + (candidate_only or "<li>无</li>") + "</ul></div></div></section>"
@@ -523,8 +534,8 @@ def build_html(report, destination):
         "<style>body{font:16px/1.7 system-ui,sans-serif;max-width:1180px;margin:28px auto;padding:0 20px;"
         "color:#18314a}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccd6e0;"
         "padding:8px;text-align:left;vertical-align:top}section{margin-top:34px;border-top:2px solid #ccd6e0;"
-        "padding-top:16px}pre{white-space:pre-wrap;background:#f1f4f8;padding:16px}.note{background:#fff4d8;"
-        "padding:16px}.diff{display:grid;grid-template-columns:1fr 1fr;gap:18px}.diff>div{background:#f7f9fb;"
+        "padding-top:16px}pre{white-space:pre-wrap;background:#f1f4f8;padding:16px}.diff{display:grid;"
+        "grid-template-columns:1fr 1fr;gap:18px}.diff>div{background:#f7f9fb;"
         "padding:12px}li{margin-bottom:8px}code{overflow-wrap:anywhere}.score{display:inline-block;"
         "background:#e5f0e5;color:#20502b;border-radius:4px;padding:0 6px;margin-right:6px;"
         "font-variant-numeric:tabular-nums}@media(max-width:760px){.diff{grid-template-columns:1fr}}</style>"
@@ -536,10 +547,6 @@ def build_html(report, destination):
            if report["summary"]["average_block_f1"] is not None else "无")
         + "；标题一致 " + str(report["summary"]["title_matches"]) + " 页；需人工核查 "
         + str(report["summary"]["review_count"]) + " 页。</p>"
-        "<p class=\"note\">近似匹配阈值 " + format(report["block_match_threshold"], ".2f")
-        + "：只在空白、Markdown 行首符号或极小字符串差异上不同的块按匹配计算，不进入未匹配差异列表，"
-        + "也不在报告中展开原文；"
-        "全文字符 5-gram F1 仍保留，作为另一种独立证据。</p>"
         "<p>Trafilatura 版本：" + escape(str(report["trafilatura_version"])) + "；上游："
         "<a href=\"" + escape(report["trafilatura_repository"], quote=True) + "\">"
         + escape(report["trafilatura_repository"]) + "</a>。</p>"
@@ -601,7 +608,7 @@ def build_markdown(report, destination):
         "- Trafilatura 使用默认回退路径，关闭评论，保留表格。",
         "- 两边都做 Unicode 兼容规范化和空白规范化，去掉 Sphinx 标题末尾的 `¶`。",
         "- 标题不参加正文比较；Trafilatura 的列表符号在比较前去掉。",
-        "- 作者、编辑、来源、发布时间等页面信息单独分类保存；Trafilatura 对照只比较正文块。",
+        "- 作者、编辑、来源、发布时间等页面信息单独分类保存，并参与块级对齐；全文字符 F1 仍只比较正文块。",
         "- 整页指标是正文压缩后的字符 5-gram 精确率、召回率和 F1；顺序比仅作辅助。",
         "- 块级对齐分别把每个文本块与对面完整文本比较，因此允许一段对多段的合并/拆分，不要求形成一对一配对。",
         "- 块级匹配率是达到匹配阈值的文本块占比；近似匹配阈值为 "
