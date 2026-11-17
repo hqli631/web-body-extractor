@@ -36,6 +36,25 @@ TRAFILATURA_SETTINGS = {
 # local block reaches 95 percent character similarity. The threshold is kept
 # explicit so formatting noise does not silently become an extraction error.
 BLOCK_MATCH_THRESHOLD = 0.95
+METADATA_MATCH_THRESHOLD = 0.80
+METADATA_LABELS = (
+    "文章来源",
+    "来源",
+    "作者",
+    "责任编辑",
+    "编辑",
+    "记者",
+    "发布时间",
+    "发表时间",
+    "时间",
+    "日期",
+    "撰稿",
+    "摄影",
+    "制图",
+)
+METADATA_LABEL_PATTERN = re.compile(
+    r"^(?:" + "|".join(re.escape(label) for label in METADATA_LABELS) + r")\s*[:：]\s*"
+)
 
 
 def read_json(path):
@@ -76,6 +95,55 @@ def normalize_text(value):
 
 def compact_text(value):
     return re.sub(r"\s+", "", normalize_text(value))
+
+
+def strip_wrapping_punctuation(value):
+    text = normalize_text(value)
+    pairs = {
+        ")": "(",
+        "）": "（",
+        "]": "[",
+        "】": "【",
+        "》": "《",
+        ">": "<",
+    }
+    while len(text) >= 2 and text[-1] in pairs and text[0] == pairs[text[-1]]:
+        text = text[1:-1].strip()
+    return text
+
+
+def metadata_variants(value):
+    """Return compact text variants for page information labels and values."""
+    normalized = normalize_text(value)
+    variants = {normalized}
+    core = strip_wrapping_punctuation(normalized)
+    variants.add(core)
+    for item in (normalized, core):
+        stripped = METADATA_LABEL_PATTERN.sub("", item).strip()
+        if stripped:
+            variants.add(stripped)
+            variants.add(strip_wrapping_punctuation(stripped))
+    return {compact_text(item) for item in variants if compact_text(item)}
+
+
+def looks_like_metadata_segment(value):
+    normalized = strip_wrapping_punctuation(value)
+    return bool(METADATA_LABEL_PATTERN.match(normalized))
+
+
+def metadata_value_matches(value, metadata_value_sets):
+    """True when a baseline line is likely covered by already-classified page information."""
+    variants = metadata_variants(value)
+    for variant in variants:
+        for metadata_variants_for_item in metadata_value_sets:
+            for metadata_value in metadata_variants_for_item:
+                if variant == metadata_value:
+                    return True
+                if len(variant) < 4 or len(metadata_value) < 4:
+                    continue
+                if SequenceMatcher(None, variant, metadata_value, autojunk=False).ratio() >= METADATA_MATCH_THRESHOLD:
+                    return True
+    return False
 
 
 def ngram_scores(reference_text, candidate_text, size=5):
@@ -126,15 +194,17 @@ def own_segments(result):
     return [normalize_text(block["text"]) for block in result["blocks"] if normalize_text(block["text"])]
 
 
-def own_alignment_segments(result):
-    """Return body text plus classified page information for block alignment."""
-    segments = own_segments(result)
-    segments.extend(
+def own_metadata_segments(result):
+    return [
         normalize_text(item["text"])
         for item in result.get("metadata", [])
         if normalize_text(item.get("text"))
-    )
-    return segments
+    ]
+
+
+def own_alignment_segments(result):
+    """Return body text used for block-level extraction alignment."""
+    return own_segments(result)
 
 
 def block_similarity(left, right):
@@ -236,7 +306,13 @@ def pair_identical_blocks(reference_values, candidate_values, matched_reference,
     return exact_pairs
 
 
-def segment_alignment(reference, candidate, limit=5, threshold=BLOCK_MATCH_THRESHOLD):
+def segment_alignment(
+    reference,
+    candidate,
+    limit=5,
+    threshold=BLOCK_MATCH_THRESHOLD,
+    candidate_metadata=None,
+):
     """Compare rendered baseline segments with our blocks.
 
     Exact equality and approximate similarity both count as a content match.
@@ -249,12 +325,31 @@ def segment_alignment(reference, candidate, limit=5, threshold=BLOCK_MATCH_THRES
     """
     reference_values = [compact_text(value) for value in reference]
     candidate_values = [compact_text(value) for value in candidate]
+    metadata_value_sets = [metadata_variants(value) for value in (candidate_metadata or [])]
+    neutral_reference = {
+        index
+        for index, value in enumerate(reference_values)
+        if value and (
+            looks_like_metadata_segment(value)
+            or metadata_value_matches(value, metadata_value_sets)
+        )
+    }
+    active_reference_indices = [
+        index for index in range(len(reference_values)) if index not in neutral_reference
+    ]
+    active_reference_values = [reference_values[index] for index in active_reference_indices]
+
     matched_reference, matched_candidate = set(), set()
-    exact_pairs = pair_identical_blocks(reference_values, candidate_values, matched_reference, matched_candidate)
+    exact_pairs = pair_identical_blocks(
+        active_reference_values,
+        candidate_values,
+        matched_reference,
+        matched_candidate,
+    )
     exact_matches = len(exact_pairs)
 
     approximate_reference = []
-    for index, value in enumerate(reference_values):
+    for index, value in enumerate(active_reference_values):
         if index in matched_reference:
             continue
         if block_covered_score(value, candidate_values, threshold) is not None:
@@ -269,7 +364,11 @@ def segment_alignment(reference, candidate, limit=5, threshold=BLOCK_MATCH_THRES
     matched_candidate.update(approximate_candidate)
     approximate_matches = len(approximate_reference) + len(approximate_candidate)
 
-    unmatched_reference = [index for index in range(len(reference)) if index not in matched_reference]
+    unmatched_reference = [
+        original_index
+        for active_index, original_index in enumerate(active_reference_indices)
+        if active_index not in matched_reference
+    ]
     unmatched_candidate = [index for index in range(len(candidate)) if index not in matched_candidate]
     reference_only = []
     for index in unmatched_reference:
@@ -282,7 +381,7 @@ def segment_alignment(reference, candidate, limit=5, threshold=BLOCK_MATCH_THRES
             break
         candidate_only.append(candidate[index][:300])
 
-    reference_segments = len(reference)
+    reference_segments = len(active_reference_values)
     candidate_segments = len(candidate)
     precision = 1.0 if candidate_segments == 0 else len(matched_candidate) / candidate_segments
     recall = 1.0 if reference_segments == 0 else len(matched_reference) / reference_segments
@@ -298,6 +397,7 @@ def segment_alignment(reference, candidate, limit=5, threshold=BLOCK_MATCH_THRES
         block_f1=round(f1, 4),
         unmatched_reference=len(unmatched_reference),
         unmatched_candidate=len(unmatched_candidate),
+        neutral_reference_blocks=len(neutral_reference),
         exact_segment_matches=exact_matches,
         sequence_ratio=round(SequenceMatcher(None, reference, candidate, autojunk=False).ratio(), 4),
         reference_only=reference_only,
@@ -382,8 +482,15 @@ def compare_manifest_pages(manifest_paths, output_path, report_path, reference_d
                 reference_text = "\n".join(segments)
                 candidate_text = "\n".join(own_segments(own))
                 candidate_segments = own_alignment_segments(own)
+                candidate_metadata = own_metadata_segments(own)
                 comparison = compare_texts(own["title"], reference_title, reference_text, candidate_text)
-                comparison.update(segment_alignment(segments, candidate_segments))
+                comparison.update(
+                    segment_alignment(
+                        segments,
+                        candidate_segments,
+                        candidate_metadata=candidate_metadata,
+                    )
+                )
                 comparison["needs_manual_review"] = needs_manual_review(comparison)
                 metadata_counts = Counter(item["kind"] for item in own["metadata"])
                 comparison.update(
@@ -444,16 +551,18 @@ def compare_manifest_pages(manifest_paths, output_path, report_path, reference_d
         settings=TRAFILATURA_SETTINGS,
         comparison_method=(
             "normalized body text for whole-page 5-character n-gram precision, recall and F1; "
-            "body segments plus classified page information for block alignment; "
+            "body text for block alignment after excluding classified page information and "
+            "baseline metadata-like segments; "
             "block alignment counts exact matches and approximate matches whose compacted text is "
             "covered by the opposite full text or locally similar at character similarity >= "
             + format(BLOCK_MATCH_THRESHOLD, ".2f")
             + "; no manual adjudication"
         ),
         block_alignment_method=(
-            "Each body or classified page-information segment is evaluated independently against "
-            "the opposite full set of baseline segments so merged or split segmentation does not "
-            "have to form a one-to-one pair."
+            "Each body segment is evaluated independently against the opposite full set of body "
+            "segments so merged or split segmentation does not have to form a one-to-one pair. "
+            "Classified page information is displayed separately and is not counted as a block "
+            "difference; baseline metadata-like lines are excluded from that difference list."
         ),
         block_match_threshold=BLOCK_MATCH_THRESHOLD,
         caveat="Trafilatura is an external baseline, not absolute ground truth. It can include page furniture or omit content.",
@@ -508,7 +617,8 @@ def build_html(report, destination):
             "<p>我们标题：" + escape(page.get("own_title", "")) + "；Trafilatura 标题："
             + escape(page.get("reference_title", "")) + "。</p>"
             "<p>已分离页面信息：" + str(comparison["own_metadata"]) + " 条（"
-            + escape(metadata_kinds) + "）；页面信息参与块级对齐，正文字符F1仍只统计正文块。</p>"
+            + escape(metadata_kinds) + "）；页面信息单独展示，不计入正文块差异；"
+            "基线中同类来源、作者、编辑或发布时间也从差异列表排除。</p>"
             "<p>字符数：" + str(comparison["candidate_chars"]) + " / 基线 "
             + str(comparison["reference_chars"]) + "；精确率/召回率/F1："
             + format(comparison["char_ngram_precision"], ".3f") + " / "
@@ -608,7 +718,7 @@ def build_markdown(report, destination):
         "- Trafilatura 使用默认回退路径，关闭评论，保留表格。",
         "- 两边都做 Unicode 兼容规范化和空白规范化，去掉 Sphinx 标题末尾的 `¶`。",
         "- 标题不参加正文比较；Trafilatura 的列表符号在比较前去掉。",
-        "- 作者、编辑、来源、发布时间等页面信息单独分类保存，并参与块级对齐；全文字符 F1 仍只比较正文块。",
+        "- 作者、编辑、来源、发布时间等页面信息单独分类保存，并作为页面信息展示；正文 F1 和块级差异不把页面信息当作错误。",
         "- 整页指标是正文压缩后的字符 5-gram 精确率、召回率和 F1；顺序比仅作辅助。",
         "- 块级对齐分别把每个文本块与对面完整文本比较，因此允许一段对多段的合并/拆分，不要求形成一对一配对。",
         "- 块级匹配率是达到匹配阈值的文本块占比；近似匹配阈值为 "

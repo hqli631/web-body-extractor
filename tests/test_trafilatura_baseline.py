@@ -81,19 +81,26 @@ class TrafilaturaBaselineHelpers(unittest.TestCase):
         self.assertEqual(boundary["approximate_block_matches"], 2)
         self.assertEqual(boundary["unmatched_reference"], 0)
 
-    def test_classified_page_information_participates_in_block_alignment(self):
+    def test_classified_page_information_is_excluded_from_block_differences(self):
         result = {
             "blocks": [{"text": "正文内容"}],
-            "metadata": [{"kind": "editor", "text": "责任编辑：石秀珍 SF183"}],
+            "metadata": [{"kind": "source", "text": "上海证券报"}],
         }
         candidate_segments = baseline.own_alignment_segments(result)
-        self.assertEqual(candidate_segments, ["正文内容", "责任编辑:石秀珍 SF183"])
+        candidate_metadata = baseline.own_metadata_segments(result)
+        self.assertEqual(candidate_segments, ["正文内容"])
+        self.assertEqual(candidate_metadata, ["上海证券报"])
         alignment = baseline.segment_alignment(
-            ["责任编辑:石秀珍 SF183"],
+            ["(文章来源:上海证券报)", "正文内容"],
             candidate_segments,
+            candidate_metadata=candidate_metadata,
         )
         self.assertEqual(alignment["exact_block_matches"], 1)
         self.assertEqual(alignment["unmatched_reference"], 0)
+        self.assertEqual(alignment["unmatched_candidate"], 0)
+        self.assertEqual(alignment["neutral_reference_blocks"], 1)
+        self.assertEqual(alignment["reference_only"], [])
+        self.assertEqual(alignment["candidate_only"], [])
 
     def test_segment_alignment_allows_one_long_reference_to_cover_many_blocks(self):
         reference = ["alpha beta gamma delta epsilon zeta eta theta iota kappa"]
