@@ -139,7 +139,7 @@ def build_report(report, destination):
     baseline_report = destination / 'trafilatura_comparison.html'
     if baseline_report.exists():
         summary = load_trafilatura_summary() or {}
-        baseline_link = '<p><a href="'+baseline_report.name+'">打开完整“结果与Trafilatura外部基线对照”报告</a>。该报告是独立参照，不是人工金标。</p>'
+        baseline_link = '<p><a href="'+baseline_report.name+'">打开完整“结果与Trafilatura外部基线对照”报告</a>。该报告是独立参照，不是人工标注。</p>'
         baseline_metrics = (
             '<h2>结果与Trafilatura外部基线对照</h2>'
             '<div class="metrics">'
@@ -151,13 +151,11 @@ def build_report(report, destination):
             + '</strong></div>'
             '<div class="metric"><span>需人工核查</span><strong>'+str(summary.get('review_count','-'))+'</strong></div>'
             '</div>' + baseline_link
-            + '<p class="note">F1只比较标题和已分离页面信息之外的正文块；作者、编辑、来源、发布时间单独分类展示，不混入正文指标。'
-              'Trafilatura可能带入推荐列表、责任编辑等页面组件，也可能漏掉目录或图说，因此差异需要回到原始HTML判断。</p>'
         )
     else:
         baseline_metrics = ('<h2>结果与Trafilatura外部基线对照</h2>'
                             '<p class="note">对照报告尚未生成；运行 <code>app.py baseline</code> 后会在此处显示汇总指标和入口。</p>')
-    page += '<h1 id="top">项目一：基于XPath的规则化网页内容提取</h1><p>样本 '+str(report['samples'])+'；提取及证据检查通过 '+str(report['extraction_passed'])+'；与固定历史回归基准一致 '+str(report['baseline_matches'])+'。</p>'+baseline_metrics+'<p class="note">这是已适配布局、已有开发网页的功能回归。不是未见网页语义准确率；原文证据通过不能证明没有漏提。没有调用AI、训练模型或解析图片像素。原HTML资源可能缺失，视觉不保证与原站一致。</p><table><tr><th>样本</th><th>模板</th><th>状态</th><th>正文块</th><th>页面信息</th><th>排除项</th><th>历史基准</th></tr>'+''.join(rows)+'</table>'+''.join(sections)+'</html>'
+    page += '<h1 id="top">项目一：基于XPath的规则化网页内容提取</h1><p>样本 '+str(report['samples'])+'；提取及证据检查通过 '+str(report['extraction_passed'])+'；与固定历史回归基准一致 '+str(report['baseline_matches'])+'。</p>'+baseline_metrics+'<table><tr><th>样本</th><th>模板</th><th>状态</th><th>正文块</th><th>页面信息</th><th>排除项</th><th>历史基准</th></tr>'+''.join(rows)+'</table>'+''.join(sections)+'</html>'
     (destination/'index.html').write_text(page,encoding='utf8')
 
 def main():

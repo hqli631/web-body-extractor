@@ -340,11 +340,6 @@ def build_html(report, destination):
            if report["summary"]["average_char_ngram_f1"] is not None else "无")
         + "；标题一致 " + str(report["summary"]["title_matches"]) + " 页；需人工核查 "
         + str(report["summary"]["review_count"]) + " 页。</p>"
-        "<p class=\"note\">Trafilatura 是外部传统抽取基线，不是绝对金标。它可能保留相关新闻、导航或其他页面组件，"
-        "也可能漏掉正文。这里报告的是差异，不把基线输出自动判为正确答案。比较基于静态 HTML，"
-        "不对图片像素、JavaScript 后加载内容或人工语义争议作裁决。</p>"
-        "<p class=\"note\">字符指标只比较标题和已分离页面信息之外的正文块。作者、编辑、来源和发布时间在规则结果中单列，"
-        "不会为了迎合基线而混入正文。</p>"
         "<p>Trafilatura 版本：" + escape(str(report["trafilatura_version"])) + "；上游："
         "<a href=\"" + escape(report["trafilatura_repository"], quote=True) + "\">"
         + escape(report["trafilatura_repository"]) + "</a>。</p>"
