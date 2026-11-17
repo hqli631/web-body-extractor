@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at_utc": "2026-11-16T15:22:00.886810+00:00",
+  "generated_at_utc": "2026-11-17T01:38:27.134540+00:00",
   "trafilatura_repository": "https://github.com/adbar/trafilatura",
   "trafilatura_version": "2.3.1",
   "settings": {
@@ -62,6 +62,12 @@
         "candidate_only": [],
         "needs_manual_review": true,
         "own_blocks": 7,
+        "own_metadata": 3,
+        "own_metadata_kinds": {
+          "editor": 1,
+          "published_at": 1,
+          "source": 1
+        },
         "reference_segments": 13
       }
     },
@@ -96,6 +102,13 @@
         ],
         "needs_manual_review": false,
         "own_blocks": 26,
+        "own_metadata": 4,
+        "own_metadata_kinds": {
+          "author": 1,
+          "editor": 1,
+          "published_at": 1,
+          "source": 1
+        },
         "reference_segments": 30
       }
     },
@@ -131,6 +144,13 @@
         ],
         "needs_manual_review": true,
         "own_blocks": 33,
+        "own_metadata": 4,
+        "own_metadata_kinds": {
+          "author": 1,
+          "editor": 1,
+          "published_at": 1,
+          "source": 1
+        },
         "reference_segments": 36
       }
     },
@@ -160,6 +180,12 @@
         "candidate_only": [],
         "needs_manual_review": false,
         "own_blocks": 43,
+        "own_metadata": 3,
+        "own_metadata_kinds": {
+          "editor": 1,
+          "published_at": 1,
+          "source": 1
+        },
         "reference_segments": 49
       }
     },
@@ -189,6 +215,12 @@
         "candidate_only": [],
         "needs_manual_review": false,
         "own_blocks": 23,
+        "own_metadata": 3,
+        "own_metadata_kinds": {
+          "author": 1,
+          "published_at": 1,
+          "source": 1
+        },
         "reference_segments": 28
       }
     },
@@ -218,6 +250,11 @@
         "candidate_only": [],
         "needs_manual_review": false,
         "own_blocks": 16,
+        "own_metadata": 2,
+        "own_metadata_kinds": {
+          "published_at": 1,
+          "source": 1
+        },
         "reference_segments": 22
       }
     },
@@ -249,6 +286,8 @@
         ],
         "needs_manual_review": false,
         "own_blocks": 67,
+        "own_metadata": 0,
+        "own_metadata_kinds": {},
         "reference_segments": 7
       }
     },
@@ -280,6 +319,8 @@
         ],
         "needs_manual_review": false,
         "own_blocks": 141,
+        "own_metadata": 0,
+        "own_metadata_kinds": {},
         "reference_segments": 1
       }
     },
@@ -311,6 +352,8 @@
         ],
         "needs_manual_review": false,
         "own_blocks": 79,
+        "own_metadata": 0,
+        "own_metadata_kinds": {},
         "reference_segments": 5
       }
     },
@@ -350,6 +393,8 @@
         ],
         "needs_manual_review": false,
         "own_blocks": 115,
+        "own_metadata": 0,
+        "own_metadata_kinds": {},
         "reference_segments": 303
       }
     },
@@ -389,6 +434,8 @@
         ],
         "needs_manual_review": false,
         "own_blocks": 148,
+        "own_metadata": 0,
+        "own_metadata_kinds": {},
         "reference_segments": 412
       }
     },
@@ -428,6 +475,8 @@
         ],
         "needs_manual_review": false,
         "own_blocks": 203,
+        "own_metadata": 0,
+        "own_metadata_kinds": {},
         "reference_segments": 542
       }
     },
@@ -457,6 +506,8 @@
         ],
         "needs_manual_review": true,
         "own_blocks": 39,
+        "own_metadata": 0,
+        "own_metadata_kinds": {},
         "reference_segments": 5
       }
     },
@@ -493,6 +544,8 @@
         ],
         "needs_manual_review": false,
         "own_blocks": 32,
+        "own_metadata": 0,
+        "own_metadata_kinds": {},
         "reference_segments": 40
       }
     },
@@ -520,6 +573,8 @@
         "candidate_only": [],
         "needs_manual_review": false,
         "own_blocks": 16,
+        "own_metadata": 0,
+        "own_metadata_kinds": {},
         "reference_segments": 16
       }
     }

@@ -84,9 +84,14 @@
   ],
   "metadata": [
     {
+      "kind": "published_at",
+      "text": "2026年10月30日 00:09",
+      "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span[1]"
+    },
+    {
       "kind": "source",
-      "text": "（文章来源：上海证券报）",
-      "xpath": "/html/body/div[2]/div[4]/div[1]/div[2]/p[17]"
+      "text": "上海证券报",
+      "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span[2]"
     }
   ],
   "excluded": [

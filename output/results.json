@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at_utc": "2026-11-16T15:16:51.070898+00:00",
+  "generated_at_utc": "2026-11-17T01:38:17.642496+00:00",
   "scope": "9 historical exposed natural pages, 3 adapted layouts; functional regression, not unseen semantic accuracy",
   "samples": 9,
   "extraction_passed": 9,
@@ -60,6 +60,16 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年10月30日 13:56",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]"
+          },
+          {
+            "kind": "source",
+            "text": "中国新闻网",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]/a"
+          },
+          {
             "kind": "editor",
             "text": "【编辑:付子豪】",
             "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/div[1]"
@@ -81,7 +91,7 @@
           "static_dom_only_no_css_visibility_javascript_or_ocr"
         ]
       },
-      "seconds": 0.03083639999385923,
+      "seconds": 0.03549959999509156,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -229,6 +239,16 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年11月02日 20:26",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]"
+          },
+          {
+            "kind": "source",
+            "text": "中国新闻网",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]/a"
+          },
+          {
             "kind": "author",
             "text": "中新网记者 薄雯雯",
             "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[2]"
@@ -256,7 +276,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.028483300004154444,
+      "seconds": 0.030863800027873367,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -439,6 +459,16 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年11月03日 15:05",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]"
+          },
+          {
+            "kind": "source",
+            "text": "中国新闻网",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]/a"
+          },
+          {
             "kind": "author",
             "text": "中新社记者 孙翔",
             "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[3]"
@@ -466,7 +496,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.027988599962554872,
+      "seconds": 0.03383189998567104,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -699,6 +729,16 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年10月27日 07:27",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span"
+          },
+          {
+            "kind": "source",
+            "text": "21世纪经济报道",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/a"
+          },
+          {
             "kind": "editor",
             "text": "责任编辑：石秀珍 SF183",
             "xpath": "/html/body/div[2]/div[4]/div[1]/div[2]/p[45]"
@@ -726,7 +766,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.018071500002406538,
+      "seconds": 0.021498800022527575,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -857,7 +897,23 @@
             "xpath": "/html/body/div[2]/div[4]/div[1]/div[2]/p[23]"
           }
         ],
-        "metadata": [],
+        "metadata": [
+          {
+            "kind": "published_at",
+            "text": "2026年10月30日 07:00",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span"
+          },
+          {
+            "kind": "source",
+            "text": "21世纪经济报道",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/a"
+          },
+          {
+            "kind": "author",
+            "text": "21世纪经济报道 孙永乐",
+            "xpath": "/html/head/meta[27]"
+          }
+        ],
         "excluded": [
           {
             "kind": "promotion",
@@ -870,7 +926,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.008765799982938915,
+      "seconds": 0.01155060000019148,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -968,9 +1024,14 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年10月30日 00:09",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span[1]"
+          },
+          {
             "kind": "source",
-            "text": "（文章来源：上海证券报）",
-            "xpath": "/html/body/div[2]/div[4]/div[1]/div[2]/p[17]"
+            "text": "上海证券报",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span[2]"
           }
         ],
         "excluded": [
@@ -985,7 +1046,7 @@
           "images_present_pixels_not_extracted"
         ]
       },
-      "seconds": 0.007974499952979386,
+      "seconds": 0.010842800023965538,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -1349,7 +1410,7 @@
           "images_present_pixels_not_extracted_completeness_unknown"
         ]
       },
-      "seconds": 0.012921399960760027,
+      "seconds": 0.016671699995640665,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -2083,7 +2144,7 @@
           "images_present_pixels_not_extracted_completeness_unknown"
         ]
       },
-      "seconds": 0.0525832999846898,
+      "seconds": 0.07337559998268262,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     },
@@ -2500,7 +2561,7 @@
           "static_dom_only_no_ocr_or_javascript; container_xpath_evidence_for_text_segments; dates_and_notes_kept_in_body; legacy_br_segmentation_heuristic"
         ]
       },
-      "seconds": 0.014830100000835955,
+      "seconds": 0.019730800006072968,
       "baseline_match": true,
       "checks": "contract, source XPath, DOM order and table rows"
     }

@@ -169,6 +169,16 @@
   ],
   "metadata": [
     {
+      "kind": "published_at",
+      "text": "2026年11月03日 15:05",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]"
+    },
+    {
+      "kind": "source",
+      "text": "中国新闻网",
+      "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]/a"
+    },
+    {
       "kind": "author",
       "text": "中新社记者 孙翔",
       "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[3]"

@@ -58,7 +58,9 @@ def validate_result(result, data):
                     continue
                 original = ' '.join(nodes[0].text_content().split())
                 if ' '.join(block['text'].split()) not in original:
-                    issues.append('text_missing_in_source')
+                    attributes = {' '.join(value.split()) for value in nodes[0].attrib.values()}
+                    if key != 'metadata' or block['text'] not in attributes:
+                        issues.append('text_missing_in_source')
                 if key == 'blocks':
                     current = order[nodes[0]]
                     if current < last:

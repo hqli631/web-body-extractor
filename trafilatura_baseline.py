@@ -216,8 +216,11 @@ def compare_manifest_pages(manifest_paths, output_path, report_path, reference_d
                 comparison = compare_texts(own["title"], reference_title, reference_text, candidate_text)
                 comparison.update(segment_alignment(segments, candidate_segments))
                 comparison["needs_manual_review"] = needs_manual_review(comparison)
+                metadata_counts = Counter(item["kind"] for item in own["metadata"])
                 comparison.update(
                     own_blocks=len(own["blocks"]),
+                    own_metadata=len(own["metadata"]),
+                    own_metadata_kinds=dict(sorted(metadata_counts.items())),
                     reference_segments=len(segments),
                 )
                 record.update(status="success", own_title=own["title"], reference_title=reference_title, comparison=comparison)
@@ -290,6 +293,7 @@ def build_html(report, destination):
         rows.append(
             "<tr><td><a href=\"#" + ident + "\">" + ident + "</a></td><td>"
             + escape(page.get("group", "")) + "</td><td>" + str(comparison["own_blocks"])
+            + "</td><td>" + str(comparison["own_metadata"])
             + "</td><td>" + str(comparison["reference_segments"])
             + "</td><td>" + ("是" if comparison["title_match"] else "否")
             + "</td><td>" + ("是" if comparison["needs_manual_review"] else "否")
@@ -299,10 +303,15 @@ def build_html(report, destination):
         )
         reference_only = "".join("<li>" + escape(value) + "</li>" for value in comparison["reference_only"])
         candidate_only = "".join("<li>" + escape(value) + "</li>" for value in comparison["candidate_only"])
+        metadata_kinds = "、".join(
+            key + ":" + str(value) for key, value in comparison["own_metadata_kinds"].items()
+        ) or "无"
         details.append(
             "<section id=\"" + ident + "\"><h2>" + escape(page.get("own_title") or page["id"]) + "</h2>"
             "<p>我们标题：" + escape(page.get("own_title", "")) + "；Trafilatura 标题："
             + escape(page.get("reference_title", "")) + "。</p>"
+            "<p>已分离页面信息：" + str(comparison["own_metadata"]) + " 条（"
+            + escape(metadata_kinds) + "）；这些记录不进入正文字符F1。</p>"
             "<p>字符数：" + str(comparison["candidate_chars"]) + " / 基线 "
             + str(comparison["reference_chars"]) + "；精确率/召回率/F1："
             + format(comparison["char_ngram_precision"], ".3f") + " / "
@@ -334,11 +343,14 @@ def build_html(report, destination):
         "<p class=\"note\">Trafilatura 是外部传统抽取基线，不是绝对金标。它可能保留相关新闻、导航或其他页面组件，"
         "也可能漏掉正文。这里报告的是差异，不把基线输出自动判为正确答案。比较基于静态 HTML，"
         "不对图片像素、JavaScript 后加载内容或人工语义争议作裁决。</p>"
+        "<p class=\"note\">字符指标只比较标题和已分离页面信息之外的正文块。作者、编辑、来源和发布时间在规则结果中单列，"
+        "不会为了迎合基线而混入正文。</p>"
         "<p>Trafilatura 版本：" + escape(str(report["trafilatura_version"])) + "；上游："
         "<a href=\"" + escape(report["trafilatura_repository"], quote=True) + "\">"
         + escape(report["trafilatura_repository"]) + "</a>。</p>"
-        "<table><tr><th>页面</th><th>分组</th><th>我们块数</th><th>基线行数</th><th>标题一致</th>"
-        "<th>需核查</th><th>精确率</th><th>召回率</th><th>F1</th></tr>" + "".join(rows) + "</table>"
+        "<table><tr><th>页面</th><th>分组</th><th>我们正文块</th><th>页面信息</th><th>基线行数</th>"
+        "<th>标题一致</th><th>需核查</th><th>精确率</th><th>召回率</th><th>F1</th></tr>"
+        + "".join(rows) + "</table>"
         + "".join(details) + "</html>"
     )
     destination.write_text(page, encoding="utf8")
@@ -356,8 +368,8 @@ def build_markdown(report, destination):
         "",
         "上游仓库：" + report["trafilatura_repository"],
         "",
-        "| 页面 | 分组 | 我们块数 | 基线行数 | 标题一致 | 需核查 | 精确率 | 召回率 | F1 |",
-        "| --- | --- | ---: | ---: | --- | --- | ---: | ---: | ---: |",
+        "| 页面 | 分组 | 我们正文块 | 页面信息 | 基线行数 | 标题一致 | 需核查 | 精确率 | 召回率 | F1 |",
+        "| --- | --- | ---: | ---: | ---: | --- | --- | ---: | ---: | ---: |",
     ]
     for page in report["pages"]:
         if page["status"] != "success":
@@ -367,7 +379,8 @@ def build_markdown(report, destination):
         comparison = page["comparison"]
         lines.append(
             "| " + page["id"] + " | " + str(page.get("group", "")) + " | "
-            + str(comparison["own_blocks"]) + " | " + str(comparison["reference_segments"]) + " | "
+            + str(comparison["own_blocks"]) + " | " + str(comparison["own_metadata"]) + " | "
+            + str(comparison["reference_segments"]) + " | "
             + ("是" if comparison["title_match"] else "否") + " | "
             + ("是" if comparison["needs_manual_review"] else "否") + " | "
             + format(comparison["char_ngram_precision"], ".3f") + " | "
@@ -381,6 +394,7 @@ def build_markdown(report, destination):
         "- Trafilatura 使用默认回退路径，关闭评论，保留表格。",
         "- 两边都做 Unicode 兼容规范化和空白规范化，去掉 Sphinx 标题末尾的 `¶`。",
         "- 标题不参加正文比较；Trafilatura 的列表符号在比较前去掉。",
+        "- 作者、编辑、来源、发布时间等页面信息单独分类保存；Trafilatura 对照只比较正文块。",
         "- 主要指标是正文压缩后的字符 5-gram 精确率、召回率和 F1；顺序比仅作辅助。",
         "- Trafilatura 是外部参照，不是绝对金标。差异必须结合原始 HTML 和规则意图判断。",
     ]

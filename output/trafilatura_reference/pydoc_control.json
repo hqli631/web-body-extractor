@@ -29,7 +29,7 @@
     "language": null,
     "image": "https://docs.python.org/3.15/zh-cn/_images/social_previews/summary_tutorial_controlflow_fd916d86.png",
     "pagetype": "website",
-    "filedate": "2026-11-16",
+    "filedate": "2026-11-17",
     "source": "https://docs.python.org/3/tutorial/controlflow.html",
     "source-hostname": "Python documentation",
     "excerpt": "除了刚介绍的 while 语句，Python 还用了一些别的。我们将在本章中遇到它们。 if 语句: 最让人耳熟能详的语句应当是 if 语句： 可有零个或多个 elif 部分， else 部分也是可选的。关键字 ' elif' 是 'else if' 的缩写，用于避免过多的缩进。 if... elif... elif... 序列可以当作其它语言中 sw...",

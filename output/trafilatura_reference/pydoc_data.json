@@ -29,7 +29,7 @@
     "language": null,
     "image": "https://docs.python.org/3.15/zh-cn/_images/social_previews/summary_tutorial_datastructures_e5fee941.png",
     "pagetype": "website",
-    "filedate": "2026-11-16",
+    "filedate": "2026-11-17",
     "source": "https://docs.python.org/3/tutorial/datastructures.html",
     "source-hostname": "Python documentation",
     "excerpt": "本章深入讲解之前学过的一些内容，同时，还增加了新的知识点。 列表详解: 列表 数据类型具有更多的方法。 下面是列表对象的所有方法： 多数列表方法示例： 你可能已经注意到 insert, remove 或 sort 等仅修改列表的方法都不会打印返回值 -- 它们返回默认值 None 。 1 这是适用于 Python 中所有可变数据结构的设计原则。 你可能会注意到的另一件事是并非所有数据都可以排...",

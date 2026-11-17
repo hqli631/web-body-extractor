@@ -219,6 +219,16 @@
   ],
   "metadata": [
     {
+      "kind": "published_at",
+      "text": "2026年10月27日 07:27",
+      "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span"
+    },
+    {
+      "kind": "source",
+      "text": "21世纪经济报道",
+      "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/a"
+    },
+    {
       "kind": "editor",
       "text": "责任编辑：石秀珍 SF183",
       "xpath": "/html/body/div[2]/div[4]/div[1]/div[2]/p[45]"

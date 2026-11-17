@@ -24,11 +24,40 @@ def extract(data):
         else:
             break
 
-    def record(node,kind):
+    def record(node, kind, text=None):
         clone=html.fromstring(html.tostring(node))
         for junk in clone.xpath('.//script|.//style|.//noscript'):
             junk.drop_tree()
-        return dict(kind=kind,text=' '.join(clone.text_content().split()),xpath=tree.getroottree().getpath(node))
+        value = ' '.join(clone.text_content().split()) if text is None else ' '.join(text.split())
+        return dict(kind=kind,text=value,xpath=tree.getroottree().getpath(node))
+
+    seen_metadata=set()
+    def add_metadata(node, kind, text=None):
+        item=record(node,kind,text)
+        key=(kind,item['text'].casefold())
+        if item['text'] and key not in seen_metadata:
+            seen_metadata.add(key)
+            result['metadata'].append(item)
+
+    # The visible article header sits outside left_zw and carries the publication
+    # time and source. Keep those as page information instead of body blocks.
+    published=False
+    time_containers=tree.xpath("//div[contains(concat(' ',normalize-space(@class),' '),' content_left_time ')]")
+    for node in time_containers:
+        match=re.search(r'\d{4}年\d{1,2}月\d{1,2}日\s+\d{1,2}:\d{2}',record(node,'published_at')['text'])
+        if match:
+            add_metadata(node,'published_at',match.group(0))
+            published=True
+            break
+    if not published:
+        fallback=tree.xpath("//*[@id='pubtime_baidu']")
+        if fallback:
+            add_metadata(fallback[0],'published_at')
+    sources=tree.xpath("//div[contains(concat(' ',normalize-space(@class),' '),' content_left_time ')]//a[contains(concat(' ',normalize-space(@class),' '),' source ')]")
+    if not sources:
+        sources=tree.xpath("//*[@id='source_baidu']//a")
+    if sources:
+        add_metadata(sources[0],'source')
 
     def visit(node):
         if not isinstance(node.tag,str) or node.tag in {'script','style','noscript'}:
@@ -42,16 +71,16 @@ def extract(data):
             return
         if 'adEditor' in classes:
             item['kind']='editor'
-            result['metadata'].append(item)
+            add_metadata(node,'editor')
             return
         if node in credit_nodes:
             item['kind']='production_credit'
-            result['metadata'].append(item)
+            add_metadata(node,'production_credit')
             return
         # Full-line anchored pattern: interview questions containing a colon do not match.
         if node.tag=='p' and re.fullmatch(r'中新[网社]记者\s+[\u4e00-\u9fff·]{2,12}(?:\s+[\u4e00-\u9fff·]{2,12})*',text):
             item['kind']='author'
-            result['metadata'].append(item)
+            add_metadata(node,'author')
             return
         if node.tag=='table':
             if text:

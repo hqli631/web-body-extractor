@@ -29,7 +29,7 @@
     "language": null,
     "image": "https://docs.python.org/3.15/zh-cn/_images/social_previews/summary_tutorial_introduction_d20fd80b.png",
     "pagetype": "website",
-    "filedate": "2026-11-16",
+    "filedate": "2026-11-17",
     "source": "https://docs.python.org/3/tutorial/introduction.html",
     "source-hostname": "Python documentation",
     "excerpt": "下面的例子以是否显示提示符 (>>> 与...) 区分输入与输出：输入例子中的代码时，要键入以提示符开头的行中提示符后的所有内容；未以提示符开头的行是解释器的输出。 注意，例子中的某行出现的第二个提示符是用来结束多行命令的，此时，要键入一个空白行。 你可以使用 \"Copy\" 按钮（它会在悬停或点击代码示例时显示于右上角），它会去除提示符并省略输出，以将输...",

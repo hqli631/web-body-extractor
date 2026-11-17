@@ -29,7 +29,7 @@
     "language": null,
     "image": "https://docs.python.org/3.15/zh-cn/_images/social_previews/summary_library_index_e02daeb3.png",
     "pagetype": "website",
-    "filedate": "2026-11-16",
+    "filedate": "2026-11-17",
     "source": "https://docs.python.org/3/library/index.html",
     "source-hostname": "Python documentation",
     "excerpt": "这份库参考手册介绍了随 Python 一同分发的标准库。 它还描述了通常包含在 Python 发行版中的一些可选组件。 在其他地方， Python 语言参考手册 描述了 Python 语言的具体句法和语义，而 Python 内置对象参考 则描述了内置函数。 Python 的标准库非常庞大，所提供的功能涉及范围十分广泛，正如以下目录所显示的。 这个库包含了内置模块（以 C 编写），使得 Pyt...",

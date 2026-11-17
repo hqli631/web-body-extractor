@@ -28,6 +28,15 @@ def local_path(value):
     path = Path(value)
     return path if path.is_absolute() else ROOT / path
 
+def load_trafilatura_summary():
+    comparison_path = ROOT / 'output' / 'trafilatura_comparison.json'
+    if not comparison_path.exists():
+        return None
+    try:
+        return read_json(comparison_path).get('summary')
+    except (OSError, ValueError, TypeError):
+        return None
+
 def batch(manifest=None, output_dir=None, report_dir=None):
     manifest = Path(manifest) if manifest else ROOT / 'samples/manifest.json'
     output_dir = Path(output_dir) if output_dir else ROOT / 'output'
@@ -75,7 +84,7 @@ def build_report(report, destination):
     import os
     destination.mkdir(parents=True, exist_ok=True)
     rows, sections = [], []
-    labels = {
+    body_labels = {
         'paragraph': '段落',
         'subheading': '小标题',
         'heading': '标题',
@@ -86,6 +95,13 @@ def build_report(report, destination):
         'definition_term': '定义项',
         'definition_description': '定义说明',
         'footnote': '脚注',
+    }
+    metadata_labels = {
+        'author': '作者',
+        'editor': '责任编辑',
+        'source': '来源',
+        'published_at': '发布时间',
+        'production_credit': '制作署名',
     }
     for item in report['pages']:
         ident = escape(item['id'], quote=True)
@@ -100,20 +116,48 @@ def build_report(report, destination):
             section += '<pre>'+escape(item['error'])+'</pre>'
         else:
             section += '<p>规则：'+escape(item['template'])+'；正文块 '+str(counts[0])+'；本次提取 '+format(item['seconds']*1000,'.2f')+' ms（不含安装和报告，非性能基准）。</p>'
-            section += '<details><summary>元数据、排除项与局限</summary><pre>'+escape(json.dumps({k:result[k] for k in ('metadata','excluded','warnings')},ensure_ascii=False,indent=2))+'</pre></details><ol>'
+            section += '<h3>页面信息（与正文分离）</h3>'
+            if result['metadata']:
+                section += '<table><tr><th>类别</th><th>文本</th><th>XPath</th></tr>'
+                for metadata in result['metadata']:
+                    section += ('<tr><td>'+escape(metadata_labels.get(metadata['kind'],metadata['kind']))
+                                +'</td><td>'+escape(metadata['text'])+'</td><td><code>'
+                                +escape(metadata['xpath'])+'</code></td></tr>')
+                section += '</table>'
+            else:
+                section += '<p>本页没有规则明确识别的作者、编辑、来源、发布时间或制作署名。</p>'
+            section += '<details><summary>原始页面信息、排除项与局限（JSON）</summary><pre>'+escape(json.dumps({k:result[k] for k in ('metadata','excluded','warnings')},ensure_ascii=False,indent=2))+'</pre></details>'
+            section += '<h3>正文</h3><ol>'
             for block in result['blocks']:
-                section += '<li><span class="kind">'+escape(labels.get(block['kind'],block['kind']))+'</span><p>'+escape(block['text'])+'</p>'
+                section += '<li><span class="kind">'+escape(body_labels.get(block['kind'],block['kind']))+'</span><p>'+escape(block['text'])+'</p>'
                 if block['kind']=='table':
                     section += '<table>'+''.join('<tr>'+''.join('<td>'+escape(cell)+'</td>' for cell in row)+'</tr>' for row in block['rows'])+'</table>'
                 section += '<details><summary>XPath原文定位</summary><code>'+escape(block['xpath'])+'</code></details></li>'
             section += '</ol>'
         sections.append(section+'<p><a href="#top">返回汇总</a></p></section>')
-    page = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>项目一 · XPath规则抽取报告</title><style>body{font:16px/1.7 system-ui,sans-serif;max-width:1120px;margin:28px auto;padding:0 20px;color:#18314a}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccd6e0;padding:8px;text-align:left}section{margin-top:32px;border-top:2px solid #ccd6e0;padding-top:16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f4f8;padding:16px}code{overflow-wrap:anywhere}.kind{background:#eaf1fa;padding:3px 8px}li{margin-bottom:16px}.note{background:#fff4d8;padding:16px}a{color:#185ca2}</style>'
+    page = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>项目一 · XPath规则抽取报告</title><style>body{font:16px/1.7 system-ui,sans-serif;max-width:1120px;margin:28px auto;padding:0 20px;color:#18314a}table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border:1px solid #ccd6e0;padding:8px;text-align:left;vertical-align:top}section{margin-top:32px;border-top:2px solid #ccd6e0;padding-top:16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f4f8;padding:16px}code{overflow-wrap:anywhere}.kind{background:#eaf1fa;padding:3px 8px}li{margin-bottom:16px}.note{background:#fff4d8;padding:16px}a{color:#185ca2}.metrics{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;margin:16px 0}.metric{background:#f1f4f8;border-left:4px solid #185ca2;padding:10px}.metric strong{display:block;font-size:1.35rem}@media(max-width:760px){.metrics{grid-template-columns:1fr 1fr}}</style>'
     baseline_report = destination / 'trafilatura_comparison.html'
-    baseline_link = ('<p><a href="'+baseline_report.name+'">查看 Trafilatura 外部基线对照</a>。该报告是独立参照，不是人工金标。</p>'
-                     if baseline_report.exists() else
-                     '<p class="note">Trafilatura 外部基线对照尚未生成；运行 baseline 命令后会在此处提供入口。</p>')
-    page += '<h1 id="top">项目一：基于XPath的规则化网页正文提取</h1><p>样本 '+str(report['samples'])+'；提取及证据检查通过 '+str(report['extraction_passed'])+'；与固定历史回归基准一致 '+str(report['baseline_matches'])+'。</p>'+baseline_link+'<p class="note">这是已适配布局、已有开发网页的功能回归。不是未见网页语义准确率；原文证据通过不能证明没有漏提。没有调用AI、训练模型或解析图片像素。原HTML资源可能缺失，视觉不保证与原站一致。</p><table><tr><th>样本</th><th>模板</th><th>状态</th><th>正文块</th><th>元数据</th><th>排除项</th><th>历史基准</th></tr>'+''.join(rows)+'</table>'+''.join(sections)+'</html>'
+    if baseline_report.exists():
+        summary = load_trafilatura_summary() or {}
+        baseline_link = '<p><a href="'+baseline_report.name+'">打开完整“结果与Trafilatura外部基线对照”报告</a>。该报告是独立参照，不是人工金标。</p>'
+        baseline_metrics = (
+            '<h2>结果与Trafilatura外部基线对照</h2>'
+            '<div class="metrics">'
+            '<div class="metric"><span>对照页数</span><strong>'+str(summary.get('compared','-'))+'</strong></div>'
+            '<div class="metric"><span>标题一致</span><strong>'+str(summary.get('title_matches','-'))+'</strong></div>'
+            '<div class="metric"><span>运行错误</span><strong>'+str(summary.get('errors','-'))+'</strong></div>'
+            '<div class="metric"><span>平均字符5-gram F1</span><strong>'
+            + (format(summary['average_char_ngram_f1'],'.4f') if summary.get('average_char_ngram_f1') is not None else '-')
+            + '</strong></div>'
+            '<div class="metric"><span>需人工核查</span><strong>'+str(summary.get('review_count','-'))+'</strong></div>'
+            '</div>' + baseline_link
+            + '<p class="note">F1只比较标题和已分离页面信息之外的正文块；作者、编辑、来源、发布时间单独分类展示，不混入正文指标。'
+              'Trafilatura可能带入推荐列表、责任编辑等页面组件，也可能漏掉目录或图说，因此差异需要回到原始HTML判断。</p>'
+        )
+    else:
+        baseline_metrics = ('<h2>结果与Trafilatura外部基线对照</h2>'
+                            '<p class="note">对照报告尚未生成；运行 <code>app.py baseline</code> 后会在此处显示汇总指标和入口。</p>')
+    page += '<h1 id="top">项目一：基于XPath的规则化网页内容提取</h1><p>样本 '+str(report['samples'])+'；提取及证据检查通过 '+str(report['extraction_passed'])+'；与固定历史回归基准一致 '+str(report['baseline_matches'])+'。</p>'+baseline_metrics+'<p class="note">这是已适配布局、已有开发网页的功能回归。不是未见网页语义准确率；原文证据通过不能证明没有漏提。没有调用AI、训练模型或解析图片像素。原HTML资源可能缺失，视觉不保证与原站一致。</p><table><tr><th>样本</th><th>模板</th><th>状态</th><th>正文块</th><th>页面信息</th><th>排除项</th><th>历史基准</th></tr>'+''.join(rows)+'</table>'+''.join(sections)+'</html>'
     (destination/'index.html').write_text(page,encoding='utf8')
 
 def main():

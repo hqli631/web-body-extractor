@@ -29,7 +29,7 @@
     "language": null,
     "image": "https://docs.python.org/3.15/zh-cn/_images/social_previews/summary_tutorial_appetite_63d527a6.png",
     "pagetype": "website",
-    "filedate": "2026-11-16",
+    "filedate": "2026-11-17",
     "source": "https://docs.python.org/3/tutorial/appetite.html",
     "source-hostname": "Python documentation",
     "excerpt": "如果您的工作主要是用电脑完成的，总有一天您会想能不能自动执行一些任务。比如，对大量文本文件执行查找、替换操作；利用复杂的规则重命名、重排序一堆照片文件；也可能您想编写一个小型数据库、或开发专用的图形界面应用，甚至是开发一个简单的游戏。 作为一名专业软件开发人员，您可能要处理 C/C++/Java 库，但编码、编译、测试、再编译这些开发流程太慢了；也许您正在给这些库开发测试套件，但总觉得这项工...",

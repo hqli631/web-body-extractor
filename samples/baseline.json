@@ -45,6 +45,16 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年10月30日 13:56",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]"
+          },
+          {
+            "kind": "source",
+            "text": "中国新闻网",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]/a"
+          },
+          {
             "kind": "editor",
             "text": "【编辑:付子豪】",
             "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/div[1]"
@@ -65,8 +75,7 @@
         "warnings": [
           "static_dom_only_no_css_visibility_javascript_or_ocr"
         ]
-      },
-      "baseline_provenance": "output/stage3/repair/results.json"
+      }
     },
     "chinanews_02": {
       "source_sha256": "601ced823ca9912cacac2d0ddc3ae0e94f43f4b8b63a541f917d3e32a122aae5",
@@ -206,6 +215,16 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年11月02日 20:26",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]"
+          },
+          {
+            "kind": "source",
+            "text": "中国新闻网",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]/a"
+          },
+          {
             "kind": "author",
             "text": "中新网记者 薄雯雯",
             "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[2]"
@@ -232,8 +251,7 @@
           "static_dom_only_no_css_visibility_javascript_or_ocr",
           "images_present_pixels_not_extracted"
         ]
-      },
-      "baseline_provenance": "output/stage3/repair/results.json"
+      }
     },
     "chinanews_03": {
       "source_sha256": "1c9dea419228915c7358d39dbbdadb9771cf26d93e65887e4949ad21d4b09bb6",
@@ -408,6 +426,16 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年11月03日 15:05",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]"
+          },
+          {
+            "kind": "source",
+            "text": "中国新闻网",
+            "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[2]/a"
+          },
+          {
             "kind": "author",
             "text": "中新社记者 孙翔",
             "xpath": "/html/body/div[8]/div[1]/div[2]/div[2]/div[4]/div[2]/p[3]"
@@ -434,8 +462,7 @@
           "static_dom_only_no_css_visibility_javascript_or_ocr",
           "images_present_pixels_not_extracted"
         ]
-      },
-      "baseline_provenance": "output/stage3/repair/results.json"
+      }
     },
     "sina_01": {
       "source_sha256": "d2c40b3ca659fd59f83f427079f4ea6264b559f2b938d94014bd154cade22f84",
@@ -660,6 +687,16 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年10月27日 07:27",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span"
+          },
+          {
+            "kind": "source",
+            "text": "21世纪经济报道",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/a"
+          },
+          {
             "kind": "editor",
             "text": "责任编辑：石秀珍 SF183",
             "xpath": "/html/body/div[2]/div[4]/div[1]/div[2]/p[45]"
@@ -686,8 +723,7 @@
           "static_dom_only_no_css_visibility_javascript_or_ocr",
           "images_present_pixels_not_extracted"
         ]
-      },
-      "baseline_provenance": "output/stage3/repair/results.json"
+      }
     },
     "sina_02": {
       "source_sha256": "c655ca0fa14a9f65c87531dc4d1ede032149a796f4631b87cb0885c748e8e327",
@@ -810,7 +846,23 @@
             "xpath": "/html/body/div[2]/div[4]/div[1]/div[2]/p[23]"
           }
         ],
-        "metadata": [],
+        "metadata": [
+          {
+            "kind": "published_at",
+            "text": "2026年10月30日 07:00",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span"
+          },
+          {
+            "kind": "source",
+            "text": "21世纪经济报道",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/a"
+          },
+          {
+            "kind": "author",
+            "text": "21世纪经济报道 孙永乐",
+            "xpath": "/html/head/meta[27]"
+          }
+        ],
         "excluded": [
           {
             "kind": "promotion",
@@ -822,8 +874,7 @@
           "static_dom_only_no_css_visibility_javascript_or_ocr",
           "images_present_pixels_not_extracted"
         ]
-      },
-      "baseline_provenance": "output/stage3/repair/results.json"
+      }
     },
     "sina_03": {
       "source_sha256": "c6348f97447c665018d507e3ed78a99a2d0989b13bc60087bb075bc8680ce4c4",
@@ -913,9 +964,14 @@
         ],
         "metadata": [
           {
+            "kind": "published_at",
+            "text": "2026年10月30日 00:09",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span[1]"
+          },
+          {
             "kind": "source",
-            "text": "（文章来源：上海证券报）",
-            "xpath": "/html/body/div[2]/div[4]/div[1]/div[2]/p[17]"
+            "text": "上海证券报",
+            "xpath": "/html/body/div[2]/div[3]/div/div/div[2]/span[2]"
           }
         ],
         "excluded": [
@@ -929,8 +985,7 @@
           "static_dom_only_no_css_visibility_javascript_or_ocr",
           "images_present_pixels_not_extracted"
         ]
-      },
-      "baseline_provenance": "output/stage3/repair/results.json"
+      }
     },
     "pg_essay_01": {
       "source_sha256": "beb172c328102098dfd5fda91dc86e8899e563f34cccb4bce285f6b0ff0d809b",
@@ -1285,8 +1340,7 @@
           "static_dom_only_no_ocr_or_javascript; container_xpath_evidence_for_text_segments; dates_and_notes_kept_in_body; legacy_br_segmentation_heuristic",
           "images_present_pixels_not_extracted_completeness_unknown"
         ]
-      },
-      "baseline_provenance": "output/stage5/multitask/pg_essay_v1_train_train_1_reference.json"
+      }
     },
     "pg_essay_02": {
       "source_sha256": "a5f0d6cd7f29d2724af1bfbe1efc66f1de79d16d7bd6ada9c2cb79f16cef51f3",
@@ -2011,8 +2065,7 @@
           "static_dom_only_no_ocr_or_javascript; container_xpath_evidence_for_text_segments; dates_and_notes_kept_in_body; legacy_br_segmentation_heuristic",
           "images_present_pixels_not_extracted_completeness_unknown"
         ]
-      },
-      "baseline_provenance": "output/stage5/multitask/pg_essay_v1_train_train_2_reference.json"
+      }
     },
     "pg_essay_03": {
       "source_sha256": "db1035122e22995ec251242bed7f89696f162ac8b6863cee0f220f367b2cd7b3",
@@ -2420,8 +2473,7 @@
         "warnings": [
           "static_dom_only_no_ocr_or_javascript; container_xpath_evidence_for_text_segments; dates_and_notes_kept_in_body; legacy_br_segmentation_heuristic"
         ]
-      },
-      "baseline_provenance": "output/stage5/multitask/pg_essay_v1_dev_dev_3_reference.json"
+      }
     }
   }
 }

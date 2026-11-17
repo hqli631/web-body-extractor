@@ -12,6 +12,9 @@ import unittest
 from extractor import extract_bytes
 
 
+ROOT = Path(__file__).resolve().parents[1]
+
+
 def encoded(markup):
     return ('<meta charset="utf-8">' + markup).encode('utf-8')
 
@@ -35,6 +38,21 @@ class ExtractionControls(unittest.TestCase):
             self.assertNotIn(unwanted, text)
         self.assertEqual({x['kind'] for x in result['metadata']}, {'author', 'editor', 'source'})
         self.assertEqual(len(result['excluded']), 3)
+
+    def test_sina_header_metadata_is_classified_separately_from_body(self):
+        raw = encoded('''<meta property="article:author" content="21世纪经济报道 孙永乐">
+        <div class="date-source"><span class="date">2026年10月30日 07:00</span>
+        <span class="source">上海证券报</span></div>
+        <h1 class="main-title">分类测试</h1><div id="artibody"><p>这是正文，不应包含页面信息。</p></div>''')
+        result = extract_bytes(raw, template='sina')
+        metadata = {(item['kind'], item['text']) for item in result['metadata']}
+        self.assertIn(('published_at', '2026年10月30日 07:00'), metadata)
+        self.assertIn(('source', '上海证券报'), metadata)
+        self.assertIn(('author', '21世纪经济报道 孙永乐'), metadata)
+        body = '\n'.join(block['text'] for block in result['blocks'])
+        self.assertNotIn('2026年10月30日 07:00', body)
+        self.assertNotIn('上海证券报', body)
+        self.assertNotIn('21世纪经济报道 孙永乐', body)
 
     def test_sina_table_rows_and_text_order(self):
         raw = encoded('''<h1 class="main-title">表格文章</h1><div id="artibody">
@@ -62,6 +80,33 @@ class ExtractionControls(unittest.TestCase):
         self.assertEqual([b['text'] for b in result['blocks'] if b['kind'] == 'caption'], ['图为试点现场。'])
         self.assertEqual({x['kind'] for x in result['metadata']}, {'author', 'editor'})
         self.assertEqual(result['excluded'][0]['text'], '广告占位')
+
+    def test_chinanews_header_time_and_source_are_classified(self):
+        raw = encoded('''<div class="content_left_time">2026年11月03日 15:05　来源：
+        <a class="source" href="/">中国新闻网</a></div>
+        <h1 class="content_left_title">分类测试</h1><div class="left_zw">
+        <p>中新社记者 孙翔</p><p>这是正文。</p><p class="adEditor">【编辑:付子豪】</p></div>''')
+        result = extract_bytes(raw, template='chinanews')
+        metadata = {(item['kind'], item['text']) for item in result['metadata']}
+        self.assertIn(('published_at', '2026年11月03日 15:05'), metadata)
+        self.assertIn(('source', '中国新闻网'), metadata)
+        self.assertIn(('author', '中新社记者 孙翔'), metadata)
+        self.assertIn(('editor', '【编辑:付子豪】'), metadata)
+        body = '\n'.join(block['text'] for block in result['blocks'])
+        self.assertNotIn('2026年11月03日 15:05', body)
+        self.assertNotIn('中新社记者 孙翔', body)
+        self.assertNotIn('【编辑:付子豪】', body)
+
+    def test_saved_chinanews_page_separates_author_time_source_and_editor(self):
+        raw = (ROOT / 'samples' / 'chinanews_03.html').read_bytes()
+        result = extract_bytes(raw)
+        metadata = {(item['kind'], item['text']) for item in result['metadata']}
+        self.assertIn(('author', '中新社记者 孙翔'), metadata)
+        self.assertIn(('published_at', '2026年11月03日 15:05'), metadata)
+        self.assertIn(('source', '中国新闻网'), metadata)
+        block_texts = [block['text'] for block in result['blocks']]
+        self.assertNotIn('中新社记者 孙翔', block_texts)
+        self.assertNotIn('2026年11月03日 15:05', block_texts)
 
     def test_blog_br_and_inline_tail_preserve_order(self):
         raw = encoded('''<title>Essay</title><table><tr><td width="435"><font size="2" face="verdana">First <b>bold</b> tail.<br><br>Second paragraph.<p>Third <em>inline</em> text.</p>Fourth tail.</font></td></tr></table>''')
@@ -92,7 +137,9 @@ class ExtractionControls(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             good = root / 'good.html'
-            good.write_bytes(encoded('<h1 class="main-title">Control</h1><div id="artibody"><p>Valid body.</p></div>'))
+            good.write_bytes(encoded('''<div class="date-source"><span class="date">2026年11月17日 09:00</span>
+                <span class="source">Control Wire</span></div>
+                <h1 class="main-title">Control</h1><div id="artibody"><p>Valid body.</p></div>'''))
             bad = root / 'bad.html'
             bad.write_bytes(encoded('<h1>Unknown layout</h1><p>No adapted container.</p>'))
             pages = [dict(id=name, path=str(path), url=None, template='sina', sha256=hashlib.sha256(path.read_bytes()).hexdigest())
@@ -106,6 +153,10 @@ class ExtractionControls(unittest.TestCase):
             self.assertEqual([p['status'] for p in result['pages']], ['error', 'success'])
             self.assertTrue((root / 'output' / 'synthetic_good.json').exists())
             self.assertTrue((root / 'reports' / 'index.html').exists())
+            report = (root / 'reports' / 'index.html').read_text(encoding='utf-8')
+            self.assertIn('页面信息（与正文分离）', report)
+            self.assertIn('发布时间', report)
+            self.assertIn('Control Wire', report)
             cli = subprocess.run([sys.executable, '-X', 'utf8', str(Path(__file__).resolve().parents[1] / 'app.py'),
                                   'batch', '--manifest', str(manifest), '--output-dir', str(root / 'cli-output'),
                                   '--report-dir', str(root / 'cli-reports')], capture_output=True, text=True, encoding='utf-8')

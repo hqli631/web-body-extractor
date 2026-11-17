@@ -29,12 +29,12 @@
     {
       "source_path": "learning/generated/sina_v2.py",
       "destination": "rules/sina.py",
-      "sha256": "ea331e94719c99e2bd46653f0292adc9bea1386624d96b8d340bf529d2139003"
+      "sha256": "0CE47C4067E8871CAA0E5309B465A31BE8A25F563202F5CEB62C0452D328FA4A"
     },
     {
       "source_path": "learning/generated/chinanews_v2.py",
       "destination": "rules/chinanews.py",
-      "sha256": "9b2f47fd572bbb103b910a01292a43ccabebdc30a7e62bdbc42fa3177aa43ff2"
+      "sha256": "BD0286C88C8135CE009F5AFA05B13891EB9E70FD9AEA111BE1C92CB293B63CE8"
     },
     {
       "source_path": "learning/generated/pg_essay_v1.py",
