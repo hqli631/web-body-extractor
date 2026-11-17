@@ -35,7 +35,7 @@ py -3 -m venv .venv
 
 另外运行 Trafilatura 外部基线对照时，会生成 output/trafilatura_comparison.json、output/trafilatura_reference/ 和 reports/trafilatura_comparison.html。
 
-当前验收结果：9篇主回归样例提取成功并与历史基准一致，17项测试通过；Trafilatura 对照覆盖15页、0个运行错误。具体口径与限制见 [效果评测与验收](reports/EVALUATION.md)。这不是未见网页的语义准确率。
+当前验收结果：9篇主回归样例提取成功并与历史基准一致，22项测试通过；Trafilatura 对照覆盖15页、0个运行错误，平均字符5-gram F1 为0.9169。具体口径与限制见 [效果评测与验收](reports/EVALUATION.md)。这不是未见网页的语义准确率。
 
 运行后打开报告：
 
@@ -152,12 +152,13 @@ metadata 的 kind 当前包括：
 
 - 对每页保存 Trafilatura 的 JSON 原始结果；
 - 按字符 5-gram 计算精确率、召回率和 F1；
-- 同时报告标题是否一致、文本块数和需要人工核查的页面；
+- 同时报告标题是否一致、文本块数、块级匹配率和需要人工核查的页面；
+- 对去空白后覆盖率或局部相似度达到 `0.90` 的文本块按近似匹配处理，不把 `|`、空白或 `real`/`really` 这类极小差异列入未匹配错误；
 - 生成 output/trafilatura_comparison.json、reports/trafilatura_comparison.html 和 reports/trafilatura_comparison.md。
 
-当前结果为15/15页成功运行、15/15标题一致、平均字符 5-gram F1 为0.9169，其中3页因差异较大标记为需核查。F1只比较正文块；作者、编辑、来源和发布时间已单独分类，不混入正文指标。低分不一定表示我们的结果错误：例如 pydoc_library_index 是“标准库总目录”，Trafilatura只保留导语，我们的规则保留了目录列表，F1因此很低。相反，Trafilatura也会在新浪和中新网样例中加入推荐列表、责任编辑或其他页面组件。
+当前结果为15/15页成功运行、15/15标题一致、平均字符 5-gram F1 为0.9169、平均块级匹配 F1 为0.8873，其中3页因全文差异大于阈值标记为需核查。块级近似匹配按两侧合计统计，未匹配块为基线侧35个、规则侧46个；近似匹配只代表不列为块级差异，不代表两边都正确，也不在报告中展开原文。F1只比较正文块；作者、编辑、来源和发布时间已单独分类，不混入正文指标。低分不一定表示我们的结果错误：例如 pydoc_library_index 是“标准库总目录”，Trafilatura只保留导语，我们的规则保留了目录列表，F1因此很低。相反，Trafilatura也会在新浪和中新网样例中加入推荐列表、责任编辑或其他页面组件。
 
-Trafilatura是外部参照，不是人工金标。它只能说明“两个抽取器的输出差异在哪里”，不能自动决定哪个结果更符合语义。出现差异时必须回到原始 HTML、规则意图和页面类型判断。完整方法与经验见 [Trafilatura外部基线说明](docs/TRAFILATURA_BASELINE.md)。
+Trafilatura是外部参照，不是人工标注。它只能说明“两个抽取器的输出差异在哪里”，不能自动决定哪个结果更符合语义。出现差异时必须回到原始 HTML、规则意图和页面类型判断。完整方法与经验见 [Trafilatura外部基线说明](docs/TRAFILATURA_BASELINE.md)。
 
 ## 9．适合简历怎样写
 

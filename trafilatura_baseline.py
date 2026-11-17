@@ -31,6 +31,12 @@ TRAFILATURA_SETTINGS = {
     "include_formatting": False,
 }
 
+# A block is treated as an approximate match when its whitespace-compacted text
+# is at least 90 percent covered by the opposite blocks, or a length-comparable
+# local block reaches 90 percent character similarity. The threshold is kept
+# explicit so formatting noise does not silently become an extraction error.
+BLOCK_MATCH_THRESHOLD = 0.90
+
 
 def read_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
@@ -120,22 +126,169 @@ def own_segments(result):
     return [normalize_text(block["text"]) for block in result["blocks"] if normalize_text(block["text"])]
 
 
-def segment_alignment(reference, candidate, limit=5):
-    matcher = SequenceMatcher(None, reference, candidate, autojunk=False)
-    reference_only, candidate_only = [], []
-    exact_matches = 0
-    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-        if tag == "equal":
-            exact_matches += i2 - i1
+def block_similarity(left, right):
+    """Whitespace-insensitive character similarity of two already-normalized blocks."""
+    left_value = compact_text(left)
+    right_value = compact_text(right)
+    if not left_value and not right_value:
+        return 1.0
+    if not left_value or not right_value:
+        return 0.0
+    matching = sum(
+        block.size for block in SequenceMatcher(None, left_value, right_value, autojunk=False).get_matching_blocks()
+    )
+    return matching / max(len(left_value), len(right_value))
+
+
+def block_covered_score(block_value, opposite_values, threshold=BLOCK_MATCH_THRESHOLD):
+    """Coverage of one compacted block by any opposite blocks, or ``None``."""
+    if not block_value:
+        return None
+    opposite_values = [value for value in opposite_values if value]
+    if not opposite_values:
+        return None
+    block_length = len(block_value)
+    intervals = []
+    best_ratio = 0.0
+    for opposite_value in opposite_values:
+        if block_value in opposite_value:
+            return 1.0
+        start = 0
+        while True:
+            position = block_value.find(opposite_value, start)
+            if position < 0:
+                break
+            intervals.append((position, position + len(opposite_value)))
+            start = position + len(opposite_value)
+        length_ratio = min(block_length, len(opposite_value)) / max(block_length, len(opposite_value))
+        if length_ratio >= 0.6:
+            ratio = SequenceMatcher(None, block_value, opposite_value, autojunk=False).ratio()
+            best_ratio = max(best_ratio, ratio)
+            if best_ratio >= threshold:
+                return best_ratio
+
+    def covered_length(items):
+        if not items:
+            return 0
+        items = sorted(items)
+        covered = 0
+        start, end = items[0]
+        for next_start, next_end in items[1:]:
+            if next_start > end:
+                covered += end - start
+                start, end = next_start, next_end
+            else:
+                end = max(end, next_end)
+        return covered + end - start
+
+    coverage = covered_length(intervals) / block_length
+    if coverage >= threshold:
+        return coverage
+
+    # A long merged reference can contain a paragraph with one small edit but
+    # not as an exact substring. Align only against a few long candidates so
+    # the normal case stays linear and the full corpus is never rescanned.
+    for opposite_value in sorted(opposite_values, key=len, reverse=True)[:3]:
+        if block_value in opposite_value or opposite_value in block_value:
             continue
-        if tag in {"delete", "replace"} and len(reference_only) < limit:
-            reference_only.append(" ".join(reference[i1:i2])[:300])
-        if tag in {"insert", "replace"} and len(candidate_only) < limit:
-            candidate_only.append(" ".join(candidate[j1:j2])[:300])
-    ratio = matcher.ratio()
+        matcher = SequenceMatcher(None, block_value, opposite_value, autojunk=False)
+        intervals.extend(
+            (position, position + size)
+            for _a, position, size in matcher.get_matching_blocks()
+            if size
+        )
+        coverage = covered_length(intervals) / block_length
+        if coverage >= threshold:
+            return coverage
+
+    score = max(coverage, best_ratio)
+    return score if score >= threshold else None
+
+
+def pair_identical_blocks(reference_values, candidate_values, matched_reference, matched_candidate):
+    pairs = []
+    exact_pairs = []
+    for reference_index, reference_value in enumerate(reference_values):
+        if reference_index in matched_reference or not reference_value:
+            continue
+        for candidate_index, candidate_value in enumerate(candidate_values):
+            if candidate_index in matched_candidate or candidate_value != reference_value:
+                continue
+            pairs.append((abs(reference_index - candidate_index), reference_index, candidate_index))
+    pairs.sort()
+    for _distance, reference_index, candidate_index in pairs:
+        if reference_index in matched_reference or candidate_index in matched_candidate:
+            continue
+        matched_reference.add(reference_index)
+        matched_candidate.add(candidate_index)
+        exact_pairs.append((reference_index, candidate_index))
+    return exact_pairs
+
+
+def segment_alignment(reference, candidate, limit=5, threshold=BLOCK_MATCH_THRESHOLD):
+    """Compare rendered baseline segments with our blocks.
+
+    Exact equality and approximate similarity both count as a content match.
+    Differences are the blocks that stay unpaired on either side, so Markdown
+    noise such as a leading ``|`` no longer inflates the error list. One
+    baseline segment may cover several of our blocks, or the reverse, when the
+    two extractors segment their output differently. Coverage is evaluated
+    against the opposite full text so a long merged segment cannot be mistaken
+    for a normal one-to-one block pair.
+    """
+    reference_values = [compact_text(value) for value in reference]
+    candidate_values = [compact_text(value) for value in candidate]
+    matched_reference, matched_candidate = set(), set()
+    exact_pairs = pair_identical_blocks(reference_values, candidate_values, matched_reference, matched_candidate)
+    exact_matches = len(exact_pairs)
+
+    approximate_reference = []
+    for index, value in enumerate(reference_values):
+        if index in matched_reference:
+            continue
+        if block_covered_score(value, candidate_values, threshold) is not None:
+            approximate_reference.append(index)
+    approximate_candidate = []
+    for index, value in enumerate(candidate_values):
+        if index in matched_candidate:
+            continue
+        if block_covered_score(value, reference_values, threshold) is not None:
+            approximate_candidate.append(index)
+    matched_reference.update(approximate_reference)
+    matched_candidate.update(approximate_candidate)
+    approximate_matches = len(approximate_reference) + len(approximate_candidate)
+
+    unmatched_reference = [index for index in range(len(reference)) if index not in matched_reference]
+    unmatched_candidate = [index for index in range(len(candidate)) if index not in matched_candidate]
+    reference_only = []
+    for index in unmatched_reference:
+        if len(reference_only) >= limit:
+            break
+        reference_only.append(reference[index][:300])
+    candidate_only = []
+    for index in unmatched_candidate:
+        if len(candidate_only) >= limit:
+            break
+        candidate_only.append(candidate[index][:300])
+
+    reference_segments = len(reference)
+    candidate_segments = len(candidate)
+    precision = 1.0 if candidate_segments == 0 else len(matched_candidate) / candidate_segments
+    recall = 1.0 if reference_segments == 0 else len(matched_reference) / reference_segments
+    f1 = 0.0 if precision + recall == 0 else 2 * precision * recall / (precision + recall)
     return dict(
+        block_match_threshold=threshold,
+        exact_block_matches=exact_matches,
+        approximate_block_matches=approximate_matches,
+        approximate_reference_blocks=len(approximate_reference),
+        approximate_candidate_blocks=len(approximate_candidate),
+        block_precision=round(precision, 4),
+        block_recall=round(recall, 4),
+        block_f1=round(f1, 4),
+        unmatched_reference=len(unmatched_reference),
+        unmatched_candidate=len(unmatched_candidate),
         exact_segment_matches=exact_matches,
-        sequence_ratio=round(ratio, 4),
+        sequence_ratio=round(SequenceMatcher(None, reference, candidate, autojunk=False).ratio(), 4),
         reference_only=reference_only,
         candidate_only=candidate_only,
     )
@@ -157,7 +310,12 @@ def compare_texts(own_title, reference_title, reference_text, candidate_text):
 
 
 def needs_manual_review(comparison, threshold=0.9):
-    """Flag large disagreements without deciding which extractor is correct."""
+    """Flag large disagreements without deciding which extractor is correct.
+
+    The trigger stays on whole-page character coverage. Block alignment is
+    segmentation-sensitive by nature, so it is reported as a separate piece of
+    evidence instead of being folded into the same gate.
+    """
     return (
         comparison["char_ngram_precision"] < threshold
         or comparison["char_ngram_recall"] < threshold
@@ -254,6 +412,18 @@ def compare_manifest_pages(manifest_paths, output_path, report_path, reference_d
         average_sequence_ratio=round(
             sum(page["comparison"]["sequence_ratio"] for page in successful) / len(successful), 4
         ) if successful else None,
+        average_block_precision=round(
+            sum(page["comparison"]["block_precision"] for page in successful) / len(successful), 4
+        ) if successful else None,
+        average_block_recall=round(
+            sum(page["comparison"]["block_recall"] for page in successful) / len(successful), 4
+        ) if successful else None,
+        average_block_f1=round(
+            sum(page["comparison"]["block_f1"] for page in successful) / len(successful), 4
+        ) if successful else None,
+        approximate_block_matches=sum(page["comparison"]["approximate_block_matches"] for page in successful),
+        unmatched_reference_blocks=sum(page["comparison"]["unmatched_reference"] for page in successful),
+        unmatched_candidate_blocks=sum(page["comparison"]["unmatched_candidate"] for page in successful),
     )
     report = dict(
         version=1,
@@ -261,7 +431,18 @@ def compare_manifest_pages(manifest_paths, output_path, report_path, reference_d
         trafilatura_repository=TRAFILATURA_REPOSITORY,
         trafilatura_version=getattr(trafilatura, "__version__", None),
         settings=TRAFILATURA_SETTINGS,
-        comparison_method="normalized body segments; 5-character n-gram precision, recall and F1; no manual adjudication",
+        comparison_method=(
+            "normalized body segments; whole-page 5-character n-gram precision, recall and F1; "
+            "block alignment counts exact matches and approximate matches whose compacted text is "
+            "covered by the opposite full text or locally similar at character similarity >= "
+            + format(BLOCK_MATCH_THRESHOLD, ".2f")
+            + "; no manual adjudication"
+        ),
+        block_alignment_method=(
+            "Each block is evaluated independently against the opposite full set of blocks so merged "
+            "or split segmentation does not have to form a one-to-one pair."
+        ),
+        block_match_threshold=BLOCK_MATCH_THRESHOLD,
         caveat="Trafilatura is an external baseline, not absolute ground truth. It can include page furniture or omit content.",
         manifests=manifests,
         summary=summary,
@@ -283,7 +464,7 @@ def build_html(report, destination):
         if page["status"] == "error":
             rows.append(
                 "<tr><td><a href=\"#" + ident + "\">" + ident + "</a></td><td>"
-                + escape(page.get("group", "")) + "</td><td>error</td><td colspan=\"7\">"
+                + escape(page.get("group", "")) + "</td><td>error</td><td colspan=\"10\">"
                 + escape(page.get("error", "")) + "</td></tr>"
             )
             details.append("<section id=\"" + ident + "\"><h2>" + ident + "</h2><pre>"
@@ -297,6 +478,9 @@ def build_html(report, destination):
             + "</td><td>" + str(comparison["reference_segments"])
             + "</td><td>" + ("是" if comparison["title_match"] else "否")
             + "</td><td>" + ("是" if comparison["needs_manual_review"] else "否")
+            + "</td><td>" + str(comparison["exact_block_matches"])
+            + "</td><td>" + str(comparison["approximate_block_matches"])
+            + "</td><td>" + format(comparison["block_f1"], ".3f")
             + "</td><td>" + format(comparison["char_ngram_precision"], ".3f")
             + "</td><td>" + format(comparison["char_ngram_recall"], ".3f")
             + "</td><td>" + format(comparison["char_ngram_f1"], ".3f") + "</td></tr>"
@@ -319,8 +503,17 @@ def build_html(report, destination):
             + format(comparison["char_ngram_f1"], ".3f") + "；顺序比 "
             + format(comparison["sequence_ratio"], ".3f") + "；需人工核查 "
             + ("是" if comparison["needs_manual_review"] else "否") + "。</p>"
-            "<div class=\"diff\"><div><h3>只在 Trafilatura 基线中</h3><ul>"
-            + (reference_only or "<li>无</li>") + "</ul></div><div><h3>只在我们的结果中</h3><ul>"
+            "<p>块级对齐：完全一致 " + str(comparison["exact_block_matches"]) + "，近似匹配 "
+            + str(comparison["approximate_block_matches"]) + " 个文本块（阈值 "
+            + format(comparison["block_match_threshold"], ".2f") + "），未匹配 "
+            + str(comparison["unmatched_reference"]) + " / " + str(comparison["unmatched_candidate"])
+            + "；块级匹配精确率/召回率/F1：" + format(comparison["block_precision"], ".3f") + " / "
+            + format(comparison["block_recall"], ".3f") + " / "
+            + format(comparison["block_f1"], ".3f") + "。</p>"
+            "<p class=\"note\">达到阈值的近似匹配只计数，不展开原文，也不计入未匹配差异；"
+            "未匹配列表仅保留没有对应内容的文本块。</p>"
+            "<div class=\"diff\"><div><h3>未匹配的 Trafilatura 基线块</h3><ul>"
+            + (reference_only or "<li>无</li>") + "</ul></div><div><h3>未匹配的规则提取块</h3><ul>"
             + (candidate_only or "<li>无</li>") + "</ul></div></div></section>"
         )
     page = (
@@ -332,19 +525,27 @@ def build_html(report, destination):
         "padding:8px;text-align:left;vertical-align:top}section{margin-top:34px;border-top:2px solid #ccd6e0;"
         "padding-top:16px}pre{white-space:pre-wrap;background:#f1f4f8;padding:16px}.note{background:#fff4d8;"
         "padding:16px}.diff{display:grid;grid-template-columns:1fr 1fr;gap:18px}.diff>div{background:#f7f9fb;"
-        "padding:12px}li{margin-bottom:8px}code{overflow-wrap:anywhere}@media(max-width:760px){.diff{"
-        "grid-template-columns:1fr}}</style>"
+        "padding:12px}li{margin-bottom:8px}code{overflow-wrap:anywhere}.score{display:inline-block;"
+        "background:#e5f0e5;color:#20502b;border-radius:4px;padding:0 6px;margin-right:6px;"
+        "font-variant-numeric:tabular-nums}@media(max-width:760px){.diff{grid-template-columns:1fr}}</style>"
         "<h1>项目一：Trafilatura 外部基线对照</h1>"
         "<p>对照 " + str(report["summary"]["compared"]) + " 页；平均字符 5-gram F1 "
         + (format(report["summary"]["average_char_ngram_f1"], ".3f")
            if report["summary"]["average_char_ngram_f1"] is not None else "无")
+        + "；平均块级 F1 " + (format(report["summary"]["average_block_f1"], ".3f")
+           if report["summary"]["average_block_f1"] is not None else "无")
         + "；标题一致 " + str(report["summary"]["title_matches"]) + " 页；需人工核查 "
         + str(report["summary"]["review_count"]) + " 页。</p>"
+        "<p class=\"note\">近似匹配阈值 " + format(report["block_match_threshold"], ".2f")
+        + "：只在空白、Markdown 行首符号或极小字符串差异上不同的块按匹配计算，不进入未匹配差异列表，"
+        + "也不在报告中展开原文；"
+        "全文字符 5-gram F1 仍保留，作为另一种独立证据。</p>"
         "<p>Trafilatura 版本：" + escape(str(report["trafilatura_version"])) + "；上游："
         "<a href=\"" + escape(report["trafilatura_repository"], quote=True) + "\">"
         + escape(report["trafilatura_repository"]) + "</a>。</p>"
         "<table><tr><th>页面</th><th>分组</th><th>我们正文块</th><th>页面信息</th><th>基线行数</th>"
-        "<th>标题一致</th><th>需核查</th><th>精确率</th><th>召回率</th><th>F1</th></tr>"
+        "<th>标题一致</th><th>需核查</th><th>块完全一致</th><th>块近似匹配</th><th>块级匹配F1</th>"
+        "<th>全文精确率</th><th>全文召回率</th><th>全文F1</th></tr>"
         + "".join(rows) + "</table>"
         + "".join(details) + "</html>"
     )
@@ -363,12 +564,12 @@ def build_markdown(report, destination):
         "",
         "上游仓库：" + report["trafilatura_repository"],
         "",
-        "| 页面 | 分组 | 我们正文块 | 页面信息 | 基线行数 | 标题一致 | 需核查 | 精确率 | 召回率 | F1 |",
-        "| --- | --- | ---: | ---: | ---: | --- | --- | ---: | ---: | ---: |",
+        "| 页面 | 分组 | 我们正文块 | 页面信息 | 基线行数 | 标题一致 | 需核查 | 块完全一致 | 块近似匹配 | 块级匹配F1 | 全文精确率 | 全文召回率 | 全文F1 |",
+        "| --- | --- | ---: | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for page in report["pages"]:
         if page["status"] != "success":
-            lines.append("| " + page["id"] + " | " + str(page.get("group", "")) + " | - | - | - | - | - | - | `"
+            lines.append("| " + page["id"] + " | " + str(page.get("group", "")) + " | - | - | - | - | - | - | - | - | - | - | `"
                          + page.get("error", "").replace("|", "\\|") + "` |")
             continue
         comparison = page["comparison"]
@@ -378,11 +579,22 @@ def build_markdown(report, destination):
             + str(comparison["reference_segments"]) + " | "
             + ("是" if comparison["title_match"] else "否") + " | "
             + ("是" if comparison["needs_manual_review"] else "否") + " | "
+            + str(comparison["exact_block_matches"]) + " | "
+            + str(comparison["approximate_block_matches"]) + " | "
+            + format(comparison["block_f1"], ".3f") + " | "
             + format(comparison["char_ngram_precision"], ".3f") + " | "
             + format(comparison["char_ngram_recall"], ".3f") + " | "
             + format(comparison["char_ngram_f1"], ".3f") + " |"
         )
     lines += [
+        "",
+        "汇总：平均字符5-gram F1 " + (format(report["summary"]["average_char_ngram_f1"], ".4f")
+           if report["summary"]["average_char_ngram_f1"] is not None else "无")
+        + "；平均块级 F1 " + (format(report["summary"]["average_block_f1"], ".4f")
+           if report["summary"]["average_block_f1"] is not None else "无")
+        + "；近似匹配 " + str(report["summary"]["approximate_block_matches"]) + " 块；未匹配 "
+        + str(report["summary"]["unmatched_reference_blocks"]) + " / "
+        + str(report["summary"]["unmatched_candidate_blocks"]) + " 块。",
         "",
         "## 口径",
         "",
@@ -390,7 +602,13 @@ def build_markdown(report, destination):
         "- 两边都做 Unicode 兼容规范化和空白规范化，去掉 Sphinx 标题末尾的 `¶`。",
         "- 标题不参加正文比较；Trafilatura 的列表符号在比较前去掉。",
         "- 作者、编辑、来源、发布时间等页面信息单独分类保存；Trafilatura 对照只比较正文块。",
-        "- 主要指标是正文压缩后的字符 5-gram 精确率、召回率和 F1；顺序比仅作辅助。",
-        "- Trafilatura 是外部参照，不是绝对金标。差异必须结合原始 HTML 和规则意图判断。",
+        "- 整页指标是正文压缩后的字符 5-gram 精确率、召回率和 F1；顺序比仅作辅助。",
+        "- 块级对齐分别把每个文本块与对面完整文本比较，因此允许一段对多段的合并/拆分，不要求形成一对一配对。",
+        "- 块级匹配率是达到匹配阈值的文本块占比；近似匹配阈值为 "
+        + format(report["block_match_threshold"], ".2f")
+        + "（忽略空白后的字符覆盖率达到阈值，或长度相近时局部字符相似度达到阈值），"
+        "达到阈值的块不计入未匹配差异，也不在报告中展开原文。",
+        "- 近似匹配只识别格式噪声和小范围用词差异，不证明哪一侧正确；真实内容不同的块仍会进入未匹配列表。",
+        "- Trafilatura 是外部参照，不是人工标注。差异必须结合原始 HTML 和规则意图判断。",
     ]
     destination.write_text("\n".join(lines) + chr(10), encoding="utf8")

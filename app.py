@@ -149,6 +149,10 @@ def build_report(report, destination):
             '<div class="metric"><span>平均字符5-gram F1</span><strong>'
             + (format(summary['average_char_ngram_f1'],'.4f') if summary.get('average_char_ngram_f1') is not None else '-')
             + '</strong></div>'
+            '<div class="metric"><span>平均块级匹配F1</span><strong>'
+            + (format(summary['average_block_f1'],'.4f') if summary.get('average_block_f1') is not None else '-')
+            + '</strong></div>'
+            '<div class="metric"><span>近似匹配块（两侧合计）</span><strong>'+str(summary.get('approximate_block_matches','-'))+'</strong></div>'
             '<div class="metric"><span>需人工核查</span><strong>'+str(summary.get('review_count','-'))+'</strong></div>'
             '</div>' + baseline_link
         )

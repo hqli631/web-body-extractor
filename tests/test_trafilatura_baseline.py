@@ -38,11 +38,67 @@ class TrafilaturaBaselineHelpers(unittest.TestCase):
             ["first", "second", "body"],
         )
 
+    def test_block_similarity_ignores_markdown_pipe_and_whitespace(self):
+        reference = "| September 2004 Remember the essays you had to write"
+        candidate = "September 2004 Remember the essays you had to write"
+        self.assertGreaterEqual(baseline.block_similarity(reference, candidate), baseline.BLOCK_MATCH_THRESHOLD)
+        self.assertEqual(baseline.block_similarity(">>> 2 + 2 4 >>> 50 - 5*6 20", ">>> 2 + 2 4 >>> 50 - 5*6 20"), 1.0)
+
+    def test_segment_alignment_counts_small_string_difference_as_approximate_match(self):
+        alignment = baseline.segment_alignment(
+            ["What an essay real"],
+            ["What an essay really"],
+        )
+        self.assertEqual(alignment["exact_block_matches"], 0)
+        self.assertEqual(alignment["approximate_block_matches"], 2)
+        self.assertEqual(alignment["approximate_reference_blocks"], 1)
+        self.assertEqual(alignment["approximate_candidate_blocks"], 1)
+        self.assertEqual(alignment["unmatched_reference"], 0)
+        self.assertEqual(alignment["unmatched_candidate"], 0)
+        self.assertGreaterEqual(alignment["block_f1"], baseline.BLOCK_MATCH_THRESHOLD)
+        self.assertLessEqual(alignment["block_f1"], 1.0)
+        self.assertEqual(alignment["reference_only"], [])
+        self.assertEqual(alignment["candidate_only"], [])
+
+    def test_segment_alignment_keeps_real_content_difference_unmatched(self):
+        alignment = baseline.segment_alignment(
+            ["东西问精选: 2026年11月03日 15:05:01"],
+            ["2026年7月20日,上海,参观者。中新社发 陈玉宇 摄"],
+        )
+        self.assertEqual(alignment["approximate_block_matches"], 0)
+        self.assertEqual(alignment["unmatched_reference"], 1)
+        self.assertEqual(alignment["unmatched_candidate"], 1)
+        self.assertEqual(alignment["block_f1"], 0.0)
+        self.assertEqual(len(alignment["reference_only"]), 1)
+        self.assertEqual(len(alignment["candidate_only"]), 1)
+
+    def test_segment_alignment_threshold_is_inclusive(self):
+        left = "abcdefghij"
+        right = "abcdefghik"
+        self.assertEqual(round(baseline.block_similarity(left, right), 4), 0.9)
+        boundary = baseline.segment_alignment([left], [right])
+        self.assertEqual(boundary["approximate_block_matches"], 2)
+        self.assertEqual(boundary["unmatched_reference"], 0)
+
+    def test_segment_alignment_allows_one_long_reference_to_cover_many_blocks(self):
+        reference = ["alpha beta gamma delta epsilon zeta eta theta iota kappa"]
+        candidate = ["alpha beta", "gamma delta", "epsilon zeta", "eta theta iota kappa"]
+        alignment = baseline.segment_alignment(reference, candidate)
+        self.assertEqual(alignment["unmatched_reference"], 0)
+        self.assertEqual(alignment["unmatched_candidate"], 0)
+        self.assertEqual(alignment["block_precision"], 1.0)
+        self.assertEqual(alignment["block_recall"], 1.0)
+        self.assertEqual(alignment["block_f1"], 1.0)
+
     def test_manual_review_flag_is_not_an_accuracy_verdict(self):
         passed = {"char_ngram_precision": 0.95, "char_ngram_recall": 0.95, "char_ngram_f1": 0.95}
         review = {"char_ngram_precision": 0.70, "char_ngram_recall": 0.99, "char_ngram_f1": 0.82}
         self.assertFalse(baseline.needs_manual_review(passed))
         self.assertTrue(baseline.needs_manual_review(review))
+        self.assertFalse(
+            baseline.needs_manual_review(dict(passed, block_f1=0.20)),
+            "block-level segmentation mismatch alone must not trigger the review gate",
+        )
 
     def test_call_trafilatura_rejects_empty_result(self):
         with mock.patch.object(baseline.trafilatura, "extract", return_value=None):
@@ -96,9 +152,13 @@ class TrafilaturaBaselineHelpers(unittest.TestCase):
             self.assertEqual(payload["summary"]["compared"], 1)
             self.assertEqual(payload["summary"]["errors"], 0)
             self.assertEqual(payload["summary"]["review_count"], 0)
+            self.assertIn("average_block_f1", payload["summary"])
+            self.assertIn("block_match_threshold", payload)
+            self.assertNotIn("approximate_pairs", payload["pages"][0]["comparison"])
             self.assertTrue((reference_dir / "pydoc_appetite.json").exists())
             self.assertTrue(report.exists())
             self.assertTrue(report.with_suffix(".md").exists())
+            self.assertTrue(report.with_suffix(".md").read_text(encoding="utf-8").find("块级") >= 0)
 
 
 if __name__ == "__main__":
